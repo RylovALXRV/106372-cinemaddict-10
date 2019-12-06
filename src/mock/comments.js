@@ -1,7 +1,16 @@
 import {getRandomElement, getRandomDate, castTimeFormat} from "../utils";
 
-const CommentFeatures = {
-  'EMOJIS': [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`, `trophy.png`],
+// Здесь тоже не понял про соответствие типа и картинки - не вижу нейтральной эмоции, где grinning эмоция
+// в шаблоне напутано
+const Emoji = {
+  'SLEEPING': `sleeping.png`,
+  'NEUTRAL': `smile.png`,
+  'GRINNING': `puke.png`
+};
+
+const CommentFeature = {
+  'EMOJIS': [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`],
+  'TYPES': [`sleeping`, `neutral`, `grinning`],
   'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
     `Very very old. Meh`, `Almost two hours? Seriously?`,
     `Great movie!`, `I personally did't like the movie`, `Very interesting`],
@@ -21,15 +30,15 @@ const formatDate = (date) => {
 
 const generateComment = () => {
   return {
-    emoji: getRandomElement(CommentFeatures.EMOJIS),
-    text: getRandomElement(CommentFeatures.TEXTS),
-    author: getRandomElement(CommentFeatures.AUTHORS),
+    emoji: Emoji[getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
+    text: getRandomElement(CommentFeature.TEXTS),
+    author: getRandomElement(CommentFeature.AUTHORS),
     day: formatDate(getRandomDate())
   };
 };
 
-const generateComments = (comment) => {
-  return new Array(comment).fill(``).map(generateComment);
+const generateComments = (count) => {
+  return new Array(count).fill(``).map(generateComment);
 };
 
 export {generateComments, formatDate};

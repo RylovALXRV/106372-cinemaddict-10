@@ -1,5 +1,5 @@
 import {getRandomFloatNumber, getRandomElement, getRandomInteger, getRandomDate, isRandomBoolean} from "../utils";
-import {MonthNames} from "../const";
+import {MONTH_NAMES} from "../const";
 import {generateComments} from "./comments";
 
 const FilmFeature = {
@@ -35,12 +35,14 @@ const generateDuration = () => {
   return `${getRandomInteger(0, 3)}h ${getRandomInteger(0, 60)}m`;
 };
 
-const generateFeature = (features) => {
-  return features.filter(() => Math.random() > 0.5).slice(0, 3);
+const generateFeatures = (features) => {
+  const uniqueFeatures = new Set(features.filter(() => Math.random() > 0.5).slice(0, 3));
+
+  return Array.from(uniqueFeatures);
 };
 
 const formatDate = (date) => {
-  return `${date.getDate()} ${MonthNames[date.getMonth()]} ${date.getFullYear()}`;
+  return `${date.getDate()} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
 };
 
 const generateFilm = () => {
@@ -52,17 +54,17 @@ const generateFilm = () => {
     releaseDate: formatDate(date),
     title: getRandomElement(FilmFeature.TITLES),
     year: date.getFullYear(),
-    genres: new Set(generateFeature(FilmFeature.GENRES)),
-    description: new Set(generateFeature(FilmFeature.DESCRIPTIONS)),
+    genres: generateFeatures(FilmFeature.GENRES),
+    description: generateFeatures(FilmFeature.DESCRIPTIONS).join(` `),
     poster: getRandomElement(FilmFeature.POSTERS),
     age: getRandomInteger(0, 18),
     director: getRandomElement(FilmFeature.DIRECTORS),
-    writers: new Set(generateFeature(FilmFeature.WRITERS)),
-    actors: new Set(generateFeature(FilmFeature.ACTORS)),
+    writers: generateFeatures(FilmFeature.WRITERS),
+    actors: generateFeatures(FilmFeature.ACTORS),
     country: getRandomElement(FilmFeature.COUNTRIES),
     comments: generateComments(getRandomInteger(0, 5)),
     isWatchlist: isRandomBoolean(),
-    isWatched: isRandomBoolean(),
+    isHistory: isRandomBoolean(),
     isFavorites: isRandomBoolean()
   };
 };

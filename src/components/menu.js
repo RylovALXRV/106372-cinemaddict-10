@@ -1,26 +1,17 @@
-import {getFilteredFilms, Menu} from "../mock/menu";
+import {MENU, getFilteredFilms} from "../mock/menu";
 
 const createMenuListMarkup = (films) => {
   const filteredFilms = getFilteredFilms(films);
 
-  return Menu.map((item) => {
-    return `<a href="#${item.toLocaleLowerCase()}" class="main-navigation__item">${item}
+  return MENU.map((item) => {
+    return `<a href="#${item}" class="main-navigation__item">${item[0].toLocaleUpperCase() + item.slice(1)}
               <span class="main-navigation__item-count">${filteredFilms[item].length}</span>
             </a>`;
   }).join(``);
 };
 
-const removeMenu = () => {
-  const menuElement = document.querySelector(`.main-navigation`);
-
-  if (menuElement) {
-    menuElement.remove();
-  }
-};
-
+// здесь не понял про активный элемент
 const createMenuTemplate = (films) => {
-  removeMenu();
-
   return (
     `<nav class="main-navigation">
       <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>

@@ -1,7 +1,8 @@
+import {Description} from "../const";
+
 export const createCardFilmTemplate = (film) => {
   const {title, rating, year, duration, genres, poster, description, comments} = film;
-
-  const descriptionFilm = description.length > 140 ? `${description.slice(0, 139)}...` : description;
+  const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
 
   return (
     `<article class="film-card">
@@ -10,10 +11,10 @@ export const createCardFilmTemplate = (film) => {
           <p class="film-card__info">
             <span class="film-card__year">${year}</span>
             <span class="film-card__duration">${duration}</span>
-            <span class="film-card__genre">${Array.from(genres).join(` `)}</span>
+            <span class="film-card__genre">${genres.join(` `)}</span>
           </p>
           <img src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
-          <p class="film-card__description">${Array.from(descriptionFilm).join(``)}</p>
+          <p class="film-card__description">${descriptionFilm}</p>
           <a class="film-card__comments">${comments.length} comments</a>
           <form class="film-card__controls">
             <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>

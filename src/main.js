@@ -6,6 +6,7 @@ import {createFilmsTemplate, renderFilms} from "./components/films";
 import {createProfileTemplate} from "./components/profile";
 import {generateFilms} from "./mock/card-film";
 import {removeButtonShowMore} from "./components/button-show-more";
+import {createFooterStatisticsTemplate} from "./components/footer-statistics";
 
 const films = generateFilms(Films.COUNT);
 
@@ -16,18 +17,23 @@ const render = (container, template, position = `beforeend`) => {
 };
 
 const fillHeaderElement = () => {
-  render(document.querySelector(`.header`), createProfileTemplate());
+  render(document.querySelector(`.header`), createProfileTemplate(films));
 };
 
 const fillMainElement = () => {
-  render(mainElement, createMenuTemplate(films.slice(Films.START, Films.SHOW)));
+  render(mainElement, createMenuTemplate(films));
   render(mainElement, createSortTemplate());
   render(mainElement, createFilmsTemplate(films));
+};
+
+const fillFooterElement = () => {
+  render(document.querySelector(`.footer`), createFooterStatisticsTemplate(films));
 };
 
 const fillPageElements = () => {
   fillHeaderElement();
   fillMainElement();
+  fillFooterElement();
   render(document.body, createFilmDetailsTemplate(films[0]));
 };
 
@@ -41,6 +47,5 @@ buttonShowMore.addEventListener(`click`, function () {
   filmsCount += Films.SHOW;
 
   render(document.querySelector(`.films-list__container`), renderFilms(films, prevFilmsCount, filmsCount));
-  render(mainElement, createMenuTemplate(films.slice(Films.START, filmsCount)), `afterbegin`);
   removeButtonShowMore(filmsCount, films.length);
 });

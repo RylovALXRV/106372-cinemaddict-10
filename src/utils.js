@@ -1,3 +1,5 @@
+import {UserRank} from "./const";
+
 const getRandomFloatNumber = (min, max) => {
   return parseFloat((Math.random() * (max - min) + min).toFixed(1));
 };
@@ -27,4 +29,20 @@ const isRandomBoolean = () => {
   return Math.random() > 0.5;
 };
 
-export {getRandomFloatNumber, getRandomElement, getRandomInteger, getRandomDate, castTimeFormat, isRandomBoolean};
+const getUserRank = (count) => {
+  let rank;
+
+  if (count === UserRank.NO_RANK) {
+    rank = ``;
+  } else if (count <= UserRank.NOTICE) {
+    rank = `notice`;
+  } else if (count <= UserRank.FAN) {
+    rank = `fan`;
+  } else {
+    rank = `movie buff`;
+  }
+
+  return rank;
+};
+
+export {getRandomFloatNumber, getRandomElement, getRandomInteger, getRandomDate, castTimeFormat, isRandomBoolean, getUserRank};
