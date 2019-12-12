@@ -29,5 +29,3 @@ export default class FooterStatistics {
     this._element = null;
   }
 }
-
-export {createFooterStatisticsTemplate};

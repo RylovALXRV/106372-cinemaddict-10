@@ -1,6 +1,6 @@
 import {Film, RenderPosition} from "./const";
 import {generateFilms} from "./mock/card-film";
-import {createFooterStatisticsTemplate} from "./components/footer-statistics";
+import FooterStatistics from "./components/footer-statistics";
 import {renderFilm} from "./components/card-film";
 import ButtonShowMore, {removeButtonShowMore} from "./components/button-show-more";
 import Utils from "./utils";
@@ -26,10 +26,6 @@ const filmsCommentsComponent = new FilmsComments();
 
 const renderFilms = (filmCards, parentElement, startIndex, endIndex) => {
   return filmCards.slice(startIndex, endIndex).map((filmCard) => renderFilm(filmCard, parentElement));
-};
-
-const render = (container, template, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, template);
 };
 
 const fillHeaderElement = () => {
@@ -77,7 +73,7 @@ const fillMainElement = () => {
 };
 
 const fillFooterElement = () => {
-  render(document.querySelector(`.footer`), createFooterStatisticsTemplate(films));
+  Utils.render(document.querySelector(`.footer`), new FooterStatistics(films).getElement(), RenderPosition.BEFOREEND);
 };
 
 const fillPageElements = () => {
