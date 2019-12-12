@@ -1,3 +1,5 @@
+import Utils from "../utils";
+
 const createCommentsMarkup = (film) => {
   const {comments} = film;
 
@@ -64,5 +66,27 @@ const createCommentsTemplate = (film) => {
       </div>`
   );
 };
+
+export default class Comments {
+  constructor(film) {
+    this._element = null;
+    this._film = film;
+  }
+
+  getTemplate() {
+    return createCommentsTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Utils.createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
 export {createCommentsTemplate};

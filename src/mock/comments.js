@@ -1,4 +1,4 @@
-import {getRandomElement, getRandomDate, castTimeFormat} from "../utils";
+import Utils from "../utils";
 
 // Здесь тоже не понял про соответствие типа и картинки - не вижу нейтральной эмоции, где grinning эмоция
 // в шаблоне напутано
@@ -9,7 +9,6 @@ const Emoji = {
 };
 
 const CommentFeature = {
-  'EMOJIS': [`angry.png`, `puke.png`, `sleeping.png`, `smile.png`],
   'TYPES': [`sleeping`, `neutral`, `grinning`],
   'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
     `Very very old. Meh`, `Almost two hours? Seriously?`,
@@ -19,10 +18,10 @@ const CommentFeature = {
 
 const formatDate = (date) => {
   const [months, day, hours, minutes] = [
-    castTimeFormat(date.getMonth() + 1),
-    castTimeFormat(date.getDate()),
-    castTimeFormat(date.getHours()),
-    castTimeFormat(date.getMinutes())
+    Utils.castTimeFormat(date.getMonth() + 1),
+    Utils.castTimeFormat(date.getDate()),
+    Utils.castTimeFormat(date.getHours()),
+    Utils.castTimeFormat(date.getMinutes())
   ];
 
   return `${date.getFullYear()}/${months}/${day} ${hours}:${minutes}`;
@@ -30,10 +29,10 @@ const formatDate = (date) => {
 
 const generateComment = () => {
   return {
-    emoji: Emoji[getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
-    text: getRandomElement(CommentFeature.TEXTS),
-    author: getRandomElement(CommentFeature.AUTHORS),
-    day: formatDate(getRandomDate())
+    emoji: Emoji[Utils.getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
+    text: Utils.getRandomElement(CommentFeature.TEXTS),
+    author: Utils.getRandomElement(CommentFeature.AUTHORS),
+    day: formatDate(Utils.getRandomDate())
   };
 };
 

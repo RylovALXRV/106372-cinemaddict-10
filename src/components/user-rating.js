@@ -1,3 +1,5 @@
+import Utils from "../utils";
+
 const SCORE_COUNT = 9;
 
 const createUserRantingScoreMarkup = (number) => {
@@ -44,5 +46,27 @@ const createUserRatingTemplate = (film) => {
     </div>`
   );
 };
+
+export default class UserRating {
+  constructor(film) {
+    this._element = null;
+    this._film = film;
+  }
+
+  getTemplate() {
+    return createUserRatingTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Utils.createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
 export {createUserRatingTemplate};

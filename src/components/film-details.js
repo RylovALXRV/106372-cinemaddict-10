@@ -1,5 +1,7 @@
-import {createCommentsTemplate} from "./comments";
-import {createUserRatingTemplate} from "./user-rating";
+import Utils from "../utils";
+import UserRating from "./user-rating";
+import Comments from "./comments";
+import {RenderPosition} from "../const";
 
 const generateGenresMarkup = (genres) => {
   return genres.map((genre) => {
@@ -9,7 +11,7 @@ const generateGenresMarkup = (genres) => {
 
 export const createFilmDetailsTemplate = (film) => {
   const {title, rating, duration, genres, poster, description, age,
-    director, writers, actors, releaseDate, country, isHistory} = film;
+    director, writers, actors, releaseDate, country} = film;
 
   return (
     `<section class="film-details">
@@ -62,7 +64,7 @@ export const createFilmDetailsTemplate = (film) => {
                   <td class="film-details__cell">${country}</td>
                 </tr>
                 <tr class="film-details__row">
-                  <td class="film-details__term">${genres.size > 1 ? `Genres` : `Genre`}</td>
+                  <td class="film-details__term">${genres.length > 1 ? `Genres` : `Genre`}</td>
                   <td class="film-details__cell">
                     ${generateGenresMarkup(genres)}
                 </tr>
@@ -83,9 +85,51 @@ export const createFilmDetailsTemplate = (film) => {
             <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
           </section>
         </div>
-        ${isHistory ? createUserRatingTemplate(film) : ``}
-        ${createCommentsTemplate(film)}
     </form>
   </section>`
   );
 };
+
+const renderUserRatingElement = (film, filmDetailsComponent) => {
+  const {isHistory} = film;
+
+  if (isHistory) {
+    Utils.render(filmDetailsComponent.getFilmsFormElement(), new UserRating(film).getElement(), RenderPosition.BEFOREEND);
+  }
+};
+
+export const renderFilmDetails = (film, filmDetailsComponent) => {
+  Utils.render(document.body, filmDetailsComponent.getElement(), RenderPosition.BEFOREEND);
+  renderUserRatingElement(film, filmDetailsComponent);
+  Utils.render(filmDetailsComponent.getElement(), new Comments(film).getElement(), RenderPosition.BEFOREEND);
+};
+
+export default class FilmDetails {
+  constructor(film) {
+    this._element = null;
+    this._film = film;
+  }
+
+  getTemplate() {
+    return createFilmDetailsTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Utils.createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  getFilmCloseButtonElement() {
+    return this.getElement().querySelector(`.film-details__close-btn`);
+  }
+
+  getFilmsFormElement() {
+    return this.getElement().querySelector(`.film-details__inner`);
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

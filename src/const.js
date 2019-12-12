@@ -13,7 +13,7 @@ const MONTH_NAMES = [
   `December`,
 ];
 
-const Films = {
+const Film = {
   START: 0,
   END: 2,
   SHOW: 5,
@@ -31,4 +31,10 @@ const Description = {
   'DEFAULT_LENGTH': 139
 };
 
-export {MONTH_NAMES, Films, UserRank, Description};
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  AFTEREND: `afterend`,
+  BEFOREEND: `beforeend`
+};
+
+export {MONTH_NAMES, Film, UserRank, Description, RenderPosition};
