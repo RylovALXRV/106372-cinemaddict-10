@@ -2,6 +2,8 @@ import {Description, RenderPosition} from "../const";
 import Utils from "../utils";
 import FilmDetails, {renderFilmDetails} from "./film-details";
 
+let filmDetailsComponent = null;
+
 export const createCardFilmTemplate = (film) => {
   const {title, rating, year, duration, genres, poster, description, comments} = film;
   const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
@@ -66,8 +68,6 @@ export const renderFilm = (film, parentElement) => {
 
   Utils.render(parentElement, filmElement, RenderPosition.BEFOREEND);
 };
-
-let filmDetailsComponent = null;
 
 class CardFilm {
   constructor(film) {
