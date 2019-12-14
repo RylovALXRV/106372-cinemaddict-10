@@ -90,18 +90,18 @@ export const createFilmDetailsTemplate = (film) => {
   );
 };
 
-const renderUserRatingElement = (film, filmDetailsComponent) => {
-  const {isHistory} = film;
+const renderUserRatingElement = (filmDetailsComponent) => {
+  const {isHistory} = filmDetailsComponent.getFilm();
 
   if (isHistory) {
-    Utils.render(filmDetailsComponent.getFilmsFormElement(), new UserRating(film).getElement(), RenderPosition.BEFOREEND);
+    Utils.render(filmDetailsComponent.getFilmsFormElement(), new UserRating(filmDetailsComponent.getFilm()).getElement(), RenderPosition.BEFOREEND);
   }
 };
 
-export const renderFilmDetails = (film, filmDetailsComponent) => {
+export const renderFilmDetails = (filmDetailsComponent) => {
   Utils.render(document.body, filmDetailsComponent.getElement(), RenderPosition.BEFOREEND);
-  renderUserRatingElement(film, filmDetailsComponent);
-  Utils.render(filmDetailsComponent.getElement(), new Comments(film).getElement(), RenderPosition.BEFOREEND);
+  renderUserRatingElement(filmDetailsComponent);
+  Utils.render(filmDetailsComponent.getElement(), new Comments(filmDetailsComponent.getFilm()).getElement(), RenderPosition.BEFOREEND);
 };
 
 export default class FilmDetails {
@@ -127,6 +127,10 @@ export default class FilmDetails {
 
   getFilmsFormElement() {
     return this.getElement().querySelector(`.film-details__inner`);
+  }
+
+  getFilm() {
+    return this._film;
   }
 
   removeElement() {

@@ -2,6 +2,7 @@ import {Description, RenderPosition} from "../const";
 import Utils from "../utils";
 import FilmDetails, {renderFilmDetails} from "./film-details";
 
+let currentFilm = null;
 let filmDetailsComponent = null;
 
 export const createCardFilmTemplate = (film) => {
@@ -14,7 +15,7 @@ export const createCardFilmTemplate = (film) => {
           <p class="film-card__rating">${rating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${year}</span>
-            <span class="film-card__duration">${duration}</span>
+            <span class="film-card__duration">${Utils.generateDuration(duration)}</span>
             <span class="film-card__genre">${genres.join(` `)}</span>
           </p>
           <img src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
@@ -31,17 +32,25 @@ export const createCardFilmTemplate = (film) => {
 
 const closePopup = () => {
   filmDetailsComponent.getElement().remove();
+  document.body.classList.remove(`hide-overflow`);
   document.removeEventListener(`keydown`, onEscKeydown);
+  currentFilm = null;
 };
 
 const openPopup = (film) => {
-  renderFilmDetails(film, filmDetailsComponent);
+  filmDetailsComponent = new FilmDetails(film);
+
+  filmDetailsComponent.getFilmCloseButtonElement().addEventListener(`click`, () => {
+    closePopup();
+  });
+
+  renderFilmDetails(filmDetailsComponent);
+  document.body.classList.add(`hide-overflow`);
   document.addEventListener(`keydown`, onEscKeydown);
 };
 
 const onEscKeydown = (evt) => {
-  const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-  if (isEscKey) {
+  if (Utils.isEscKeyDown(evt)) {
     closePopup();
   }
 };
@@ -49,23 +58,8 @@ const onEscKeydown = (evt) => {
 export const renderFilm = (film, parentElement) => {
   const filmComponent = new CardFilm(film);
   const filmElement = filmComponent.getElement();
-  filmDetailsComponent = new FilmDetails(film);
 
-  filmElement.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    const target = evt.target;
-
-    if (target === filmComponent.getFilmTitleElement() ||
-      target === filmComponent.getFilmPosterElement() ||
-      target === filmComponent.getFilmCommentsElement()) {
-      openPopup(film);
-    }
-  });
-
-  filmDetailsComponent.getFilmCloseButtonElement().addEventListener(`click`, () => {
-    closePopup();
-  });
-
+  filmComponent.setClickListener();
   Utils.render(parentElement, filmElement, RenderPosition.BEFOREEND);
 };
 
@@ -84,6 +78,32 @@ class CardFilm {
       this._element = Utils.createElement(this.getTemplate());
     }
     return this._element;
+  }
+
+  setClickListener() {
+    this.getElement().addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      const target = evt.target;
+
+      if (target !== this.getFilmTitleElement() &&
+        target !== this.getFilmPosterElement() &&
+        target !== this.getFilmCommentsElement()) {
+        return;
+      }
+
+      if (currentFilm && currentFilm !== this.getElement()) {
+        closePopup();
+      }
+
+      if (currentFilm !== this.getElement()) {
+        openPopup(this.getFilm());
+        currentFilm = this.getElement();
+      }
+    });
+  }
+
+  getFilm() {
+    return this._film;
   }
 
   getFilmPosterElement() {

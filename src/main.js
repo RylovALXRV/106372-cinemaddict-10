@@ -25,7 +25,7 @@ const filmsRatingComponent = new FilmsRating();
 const filmsCommentsComponent = new FilmsComments();
 
 const renderFilms = (filmCards, parentElement, startIndex, endIndex) => {
-  return filmCards.slice(startIndex, endIndex).map((filmCard) => renderFilm(filmCard, parentElement));
+  filmCards.slice(startIndex, endIndex).forEach((filmCard) => renderFilm(filmCard, parentElement));
 };
 
 const fillHeaderElement = () => {

@@ -86,4 +86,12 @@ export default class Utils {
   static compareRating(filmA, filmB) {
     return filmB.rating - filmA.rating;
   }
+
+  static generateDuration(minutes) {
+    return `${Math.floor(minutes / 60 || 0)}h ${minutes % 60}m`;
+  }
+
+  static isEscKeyDown(evt) {
+    return evt.key === `Escape` || evt.key === `Esc`;
+  }
 }

@@ -31,10 +31,6 @@ const FilmFeature = {
   'COUNTRIES': [`USA`, `Russia`, `France`, `England`, `China`]
 };
 
-const generateDuration = () => {
-  return `${Utils.getRandomInteger(0, 3)}h ${Utils.getRandomInteger(0, 60)}m`;
-};
-
 const generateFeatures = (features) => {
   const uniqueFeatures = new Set(features.filter(() => Math.random() > 0.5).slice(0, 3));
 
@@ -49,7 +45,7 @@ const generateFilm = () => {
   const date = Utils.getRandomDate();
 
   return {
-    duration: generateDuration(),
+    duration: Utils.getRandomInteger(0, 180),
     rating: Utils.getRandomFloatNumber(0, 10),
     releaseDate: formatDate(date),
     title: Utils.getRandomElement(FilmFeature.TITLES),
