@@ -1,4 +1,4 @@
-import {getRandomFloatNumber, getRandomElement, getRandomInteger, getRandomDate, isRandomBoolean} from "../utils";
+import Utils from "../utils";
 import {MONTH_NAMES} from "../const";
 import {generateComments} from "./comments";
 
@@ -31,10 +31,6 @@ const FilmFeature = {
   'COUNTRIES': [`USA`, `Russia`, `France`, `England`, `China`]
 };
 
-const generateDuration = () => {
-  return `${getRandomInteger(0, 3)}h ${getRandomInteger(0, 60)}m`;
-};
-
 const generateFeatures = (features) => {
   const uniqueFeatures = new Set(features.filter(() => Math.random() > 0.5).slice(0, 3));
 
@@ -46,26 +42,26 @@ const formatDate = (date) => {
 };
 
 const generateFilm = () => {
-  const date = getRandomDate();
+  const date = Utils.getRandomDate();
 
   return {
-    duration: generateDuration(),
-    rating: getRandomFloatNumber(0, 10),
+    duration: Utils.getRandomInteger(0, 180),
+    rating: Utils.getRandomFloatNumber(0, 10),
     releaseDate: formatDate(date),
-    title: getRandomElement(FilmFeature.TITLES),
+    title: Utils.getRandomElement(FilmFeature.TITLES),
     year: date.getFullYear(),
     genres: generateFeatures(FilmFeature.GENRES),
     description: generateFeatures(FilmFeature.DESCRIPTIONS).join(` `),
-    poster: getRandomElement(FilmFeature.POSTERS),
-    age: getRandomInteger(0, 18),
-    director: getRandomElement(FilmFeature.DIRECTORS),
+    poster: Utils.getRandomElement(FilmFeature.POSTERS),
+    age: Utils.getRandomInteger(0, 18),
+    director: Utils.getRandomElement(FilmFeature.DIRECTORS),
     writers: generateFeatures(FilmFeature.WRITERS),
     actors: generateFeatures(FilmFeature.ACTORS),
-    country: getRandomElement(FilmFeature.COUNTRIES),
-    comments: generateComments(getRandomInteger(0, 5)),
-    isWatchlist: isRandomBoolean(),
-    isHistory: isRandomBoolean(),
-    isFavorites: isRandomBoolean()
+    country: Utils.getRandomElement(FilmFeature.COUNTRIES),
+    comments: generateComments(Utils.getRandomInteger(0, 5)),
+    isWatchlist: Utils.isRandomBoolean(),
+    isHistory: Utils.isRandomBoolean(),
+    isFavorites: Utils.isRandomBoolean()
   };
 };
 

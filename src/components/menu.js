@@ -1,11 +1,13 @@
-import {MENU, getFilteredFilms} from "../mock/menu";
+import {MENU, getAmountFilms} from "../mock/menu";
+import Utils from "../utils";
 
 const createMenuListMarkup = (films) => {
-  const filteredFilms = getFilteredFilms(films);
+  const amountFilms = getAmountFilms(films);
 
   return MENU.map((item) => {
+
     return `<a href="#${item}" class="main-navigation__item">${item[0].toLocaleUpperCase() + item.slice(1)}
-              <span class="main-navigation__item-count">${filteredFilms[item].length}</span>
+              <span class="main-navigation__item-count">${amountFilms[item]}</span>
             </a>`;
   }).join(``);
 };
@@ -21,4 +23,24 @@ const createMenuTemplate = (films) => {
   );
 };
 
-export {createMenuTemplate};
+export default class Menu {
+  constructor(films) {
+    this._element = null;
+    this._films = films;
+  }
+
+  getTemplate() {
+    return createMenuTemplate(this._films);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Utils.createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
