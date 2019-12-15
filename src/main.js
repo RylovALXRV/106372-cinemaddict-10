@@ -1,5 +1,6 @@
 import {Film, RenderPosition} from "./const";
 import {generateFilms} from "./mock/card-film";
+import {getAmountFilms} from "./mock/menu";
 import FooterStatistics from "./components/footer-statistics";
 import {renderFilm} from "./components/card-film";
 import ButtonShowMore, {removeButtonShowMore} from "./components/button-show-more";
@@ -7,7 +8,7 @@ import Utils from "./utils";
 import Profile from "./components/profile";
 import Menu from "./components/menu";
 import Sort from "./components/sort";
-import Films from "./components/films";
+import Films, {createNoMoviesMarkup} from "./components/films";
 import FilmsRating from "./components/films-rating";
 import FilmsComments from "./components/films-comments";
 
@@ -44,12 +45,6 @@ const renderButtonShowMore = () => {
   Utils.render(filmsComponent.getFilmsListElement(), buttonShowMoreComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
-const renderFilmsElement = () => {
-  Utils.render(mainElement, filmsComponent.getElement(), RenderPosition.BEFOREEND);
-  renderFilms(films, filmsComponent.getFilmsListContainerElement(), Film.START, Film.SHOW);
-  renderButtonShowMore();
-};
-
 const renderFilmsRatingElement = (filmCards) => {
   if (Utils.isFilmsRating(filmCards)) {
     Utils.render(filmsComponent.getElement(), filmsRatingComponent.getElement(), RenderPosition.BEFOREEND);
@@ -64,12 +59,24 @@ const renderFilmsCommentsElement = (filmCards) => {
   }
 };
 
+const fillListsWithMovies = () => {
+  renderFilms(films, filmsComponent.getFilmsListContainerElement(), Film.START, Film.SHOW);
+  renderFilmsRatingElement(films);
+  renderFilmsCommentsElement(films);
+};
+
 const fillMainElement = () => {
   Utils.render(mainElement, menuComponent.getElement(), RenderPosition.BEFOREEND);
   Utils.render(mainElement, sortComponent.getElement(), RenderPosition.BEFOREEND);
-  renderFilmsElement();
-  renderFilmsRatingElement(films);
-  renderFilmsCommentsElement(films);
+  Utils.render(mainElement, filmsComponent.getElement(), RenderPosition.BEFOREEND);
+
+  if (films.length === getAmountFilms(films).history || !films.length) {
+    filmsComponent.getFilmsListElement().innerHTML = ``;
+    Utils.render(filmsComponent.getFilmsListElement(), Utils.createElement(createNoMoviesMarkup()), RenderPosition.BEFOREEND);
+  } else {
+    fillListsWithMovies();
+    renderButtonShowMore();
+  }
 };
 
 const fillFooterElement = () => {

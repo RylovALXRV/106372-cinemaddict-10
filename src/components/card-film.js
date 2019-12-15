@@ -59,7 +59,7 @@ export const renderFilm = (film, parentElement) => {
   const filmComponent = new CardFilm(film);
   const filmElement = filmComponent.getElement();
 
-  filmComponent.setClickListener();
+  filmComponent.setClickListener(closePopup);
   Utils.render(parentElement, filmElement, RenderPosition.BEFOREEND);
 };
 
@@ -80,19 +80,19 @@ class CardFilm {
     return this._element;
   }
 
-  setClickListener() {
+  setClickListener(callback) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
       const target = evt.target;
 
-      if (target !== this.getFilmTitleElement() &&
-        target !== this.getFilmPosterElement() &&
-        target !== this.getFilmCommentsElement()) {
+      if (target !== this._getFilmTitleElement() &&
+        target !== this._getFilmPosterElement() &&
+        target !== this._getFilmCommentsElement()) {
         return;
       }
 
       if (currentFilm && currentFilm !== this.getElement()) {
-        closePopup();
+        callback();
       }
 
       if (currentFilm !== this.getElement()) {
@@ -106,15 +106,15 @@ class CardFilm {
     return this._film;
   }
 
-  getFilmPosterElement() {
+  _getFilmPosterElement() {
     return this.getElement().querySelector(`.film-card__poster`);
   }
 
-  getFilmTitleElement() {
+  _getFilmTitleElement() {
     return this.getElement().querySelector(`.film-card__title`);
   }
 
-  getFilmCommentsElement() {
+  _getFilmCommentsElement() {
     return this.getElement().querySelector(`.film-card__comments`);
   }
 
