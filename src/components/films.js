@@ -1,5 +1,11 @@
 import Utils from "../utils";
 
+const createNoMoviesMarkup = () => {
+  return (
+    `<h2 class="films-list__title">There are no movies in our database</h2>`
+  );
+};
+
 const createFilmsTemplate = () => {
   return (
     `<section class="films">
@@ -39,3 +45,5 @@ export default class Films {
     this._element = null;
   }
 }
+
+export {createNoMoviesMarkup};
