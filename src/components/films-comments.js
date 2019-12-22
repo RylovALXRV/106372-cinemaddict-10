@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createFilmsCommentsTemplate = () => {
   return (
@@ -9,27 +9,13 @@ const createFilmsCommentsTemplate = () => {
   );
 };
 
-export default class FilmsComments {
-  constructor() {
-    this._element = null;
-  }
-
+export default class FilmsComments extends AbstractComponent {
   getTemplate() {
     return createFilmsCommentsTemplate();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
-  }
 
   getFilmsListContainer() {
     return this.getElement().querySelector(`.films-list__container`);
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

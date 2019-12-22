@@ -1,11 +1,4 @@
-import Utils from "../utils";
-
-const removeButtonShowMore = (buttonComponent, currentFilmsCount, filmsCount) => {
-  if (currentFilmsCount >= filmsCount) {
-    buttonComponent.getElement().remove();
-    buttonComponent.removeElement();
-  }
-};
+import AbstractComponent from "./abstract-component";
 
 const createButtonShowMoreTemplate = () => {
   return (
@@ -13,25 +6,12 @@ const createButtonShowMoreTemplate = () => {
   );
 };
 
-export default class ButtonShowMore {
-  constructor() {
-    this._element = null;
-  }
-
+export default class ButtonShowMore extends AbstractComponent {
   getTemplate() {
     return createButtonShowMoreTemplate();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 }
-
-export {removeButtonShowMore};

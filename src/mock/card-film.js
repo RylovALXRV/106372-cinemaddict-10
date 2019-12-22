@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import Common from "../utils/common";
 import {MONTH_NAMES} from "../const";
 import {generateComments} from "./comments";
 
@@ -42,26 +42,26 @@ const formatDate = (date) => {
 };
 
 const generateFilm = () => {
-  const date = Utils.getRandomDate();
+  const date = Common.getRandomDate();
 
   return {
-    duration: Utils.getRandomInteger(0, 180),
-    rating: Utils.getRandomFloatNumber(0, 10),
+    duration: Common.getRandomInteger(0, 180),
+    rating: Common.getRandomFloatNumber(0, 10),
     releaseDate: formatDate(date),
-    title: Utils.getRandomElement(FilmFeature.TITLES),
+    title: Common.getRandomElement(FilmFeature.TITLES),
     year: date.getFullYear(),
     genres: generateFeatures(FilmFeature.GENRES),
     description: generateFeatures(FilmFeature.DESCRIPTIONS).join(` `),
-    poster: Utils.getRandomElement(FilmFeature.POSTERS),
-    age: Utils.getRandomInteger(0, 18),
-    director: Utils.getRandomElement(FilmFeature.DIRECTORS),
+    poster: Common.getRandomElement(FilmFeature.POSTERS),
+    age: Common.getRandomInteger(0, 18),
+    director: Common.getRandomElement(FilmFeature.DIRECTORS),
     writers: generateFeatures(FilmFeature.WRITERS),
     actors: generateFeatures(FilmFeature.ACTORS),
-    country: Utils.getRandomElement(FilmFeature.COUNTRIES),
-    comments: generateComments(Utils.getRandomInteger(0, 5)),
-    isWatchlist: Utils.isRandomBoolean(),
-    isHistory: Utils.isRandomBoolean(),
-    isFavorites: Utils.isRandomBoolean()
+    country: Common.getRandomElement(FilmFeature.COUNTRIES),
+    comments: generateComments(Common.getRandomInteger(0, 5)),
+    isWatchlist: Common.isRandomBoolean(),
+    isHistory: Common.isRandomBoolean(),
+    isFavorites: Common.isRandomBoolean()
   };
 };
 

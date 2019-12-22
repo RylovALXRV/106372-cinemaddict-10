@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const SCORE_COUNT = 9;
 
@@ -47,26 +47,14 @@ const createUserRatingTemplate = (film) => {
   );
 };
 
-export default class UserRating {
+export default class UserRating extends AbstractComponent {
   constructor(film) {
-    this._element = null;
+    super();
+
     this._film = film;
   }
 
   getTemplate() {
     return createUserRatingTemplate(this._film);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
-
-export {createUserRatingTemplate};

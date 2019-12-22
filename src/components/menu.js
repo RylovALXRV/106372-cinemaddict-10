@@ -1,5 +1,6 @@
-import {MENU, getAmountFilms} from "../mock/menu";
-import Utils from "../utils";
+import {MENU} from "../const";
+import {getAmountFilms} from "../mock/menu";
+import AbstractComponent from "./abstract-component";
 
 const createMenuListMarkup = (films) => {
   const amountFilms = getAmountFilms(films);
@@ -23,24 +24,14 @@ const createMenuTemplate = (films) => {
   );
 };
 
-export default class Menu {
+export default class Menu extends AbstractComponent {
   constructor(films) {
-    this._element = null;
+    super();
+
     this._films = films;
   }
 
   getTemplate() {
     return createMenuTemplate(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
