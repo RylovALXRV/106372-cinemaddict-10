@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import Common from "../utils/common";
 
 // Здесь тоже не понял про соответствие типа и картинки - не вижу нейтральной эмоции, где grinning эмоция
 // в шаблоне напутано
@@ -18,10 +18,10 @@ const CommentFeature = {
 
 const formatDate = (date) => {
   const [months, day, hours, minutes] = [
-    Utils.castTimeFormat(date.getMonth() + 1),
-    Utils.castTimeFormat(date.getDate()),
-    Utils.castTimeFormat(date.getHours()),
-    Utils.castTimeFormat(date.getMinutes())
+    Common.castTimeFormat(date.getMonth() + 1),
+    Common.castTimeFormat(date.getDate()),
+    Common.castTimeFormat(date.getHours()),
+    Common.castTimeFormat(date.getMinutes())
   ];
 
   return `${date.getFullYear()}/${months}/${day} ${hours}:${minutes}`;
@@ -29,10 +29,10 @@ const formatDate = (date) => {
 
 const generateComment = () => {
   return {
-    emoji: Emoji[Utils.getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
-    text: Utils.getRandomElement(CommentFeature.TEXTS),
-    author: Utils.getRandomElement(CommentFeature.AUTHORS),
-    day: formatDate(Utils.getRandomDate())
+    emoji: Emoji[Common.getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
+    text: Common.getRandomElement(CommentFeature.TEXTS),
+    author: Common.getRandomElement(CommentFeature.AUTHORS),
+    day: formatDate(Common.getRandomDate())
   };
 };
 

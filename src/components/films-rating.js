@@ -1,34 +1,20 @@
-import Utils from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createFilmsRatingTemplate = () => {
   return (
     `<section class="films-list--extra">
        <h2 class="films-list__title">Top rated</h2>
        <div class="films-list__container"></div>
-     </section>`);
+     </section>`
+  );
 };
 
-export default class FilmsRating {
-  constructor() {
-    this._element = null;
-  }
-
+export default class FilmsRating extends AbstractComponent {
   getTemplate() {
     return createFilmsRatingTemplate();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
   getFilmsListContainer() {
     return this.getElement().querySelector(`.films-list__container`);
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

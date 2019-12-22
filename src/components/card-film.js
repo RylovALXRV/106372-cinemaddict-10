@@ -1,9 +1,6 @@
-import {Description, RenderPosition} from "../const";
-import Utils from "../utils";
-import FilmDetails, {renderFilmDetails} from "./film-details";
-
-let currentFilm = null;
-let filmDetailsComponent = null;
+import {Description} from "../const";
+import Common from "../utils/common";
+import AbstractComponent from "./abstract-component";
 
 export const createCardFilmTemplate = (film) => {
   const {title, rating, year, duration, genres, poster, description, comments} = film;
@@ -15,7 +12,7 @@ export const createCardFilmTemplate = (film) => {
           <p class="film-card__rating">${rating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${year}</span>
-            <span class="film-card__duration">${Utils.generateDuration(duration)}</span>
+            <span class="film-card__duration">${Common.generateDuration(duration)}</span>
             <span class="film-card__genre">${genres.join(` `)}</span>
           </p>
           <img src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
@@ -30,42 +27,10 @@ export const createCardFilmTemplate = (film) => {
   );
 };
 
-const closePopup = () => {
-  filmDetailsComponent.getElement().remove();
-  document.body.classList.remove(`hide-overflow`);
-  document.removeEventListener(`keydown`, onEscKeydown);
-  currentFilm = null;
-};
-
-const openPopup = (film) => {
-  filmDetailsComponent = new FilmDetails(film);
-
-  filmDetailsComponent.getFilmCloseButtonElement().addEventListener(`click`, () => {
-    closePopup();
-  });
-
-  renderFilmDetails(filmDetailsComponent);
-  document.body.classList.add(`hide-overflow`);
-  document.addEventListener(`keydown`, onEscKeydown);
-};
-
-const onEscKeydown = (evt) => {
-  if (Utils.isEscKeyDown(evt)) {
-    closePopup();
-  }
-};
-
-export const renderFilm = (film, parentElement) => {
-  const filmComponent = new CardFilm(film);
-  const filmElement = filmComponent.getElement();
-
-  filmComponent.setClickListener(closePopup);
-  Utils.render(parentElement, filmElement, RenderPosition.BEFOREEND);
-};
-
-class CardFilm {
+export default class CardFilm extends AbstractComponent {
   constructor(film) {
-    this._element = null;
+    super();
+
     this._film = film;
   }
 
@@ -73,52 +38,19 @@ class CardFilm {
     return createCardFilmTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
+  setClickHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 
-  setClickListener(callback) {
-    this.getElement().addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      const target = evt.target;
-
-      if (target !== this._getFilmTitleElement() &&
-        target !== this._getFilmPosterElement() &&
-        target !== this._getFilmCommentsElement()) {
-        return;
-      }
-
-      if (currentFilm && currentFilm !== this.getElement()) {
-        callback();
-      }
-
-      if (currentFilm !== this.getElement()) {
-        openPopup(this.getFilm());
-        currentFilm = this.getElement();
-      }
-    });
-  }
-
-  getFilm() {
-    return this._film;
-  }
-
-  _getFilmPosterElement() {
+  getFilmPosterElement() {
     return this.getElement().querySelector(`.film-card__poster`);
   }
 
-  _getFilmTitleElement() {
+  getFilmTitleElement() {
     return this.getElement().querySelector(`.film-card__title`);
   }
 
-  _getFilmCommentsElement() {
+  getFilmCommentsElement() {
     return this.getElement().querySelector(`.film-card__comments`);
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

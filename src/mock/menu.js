@@ -1,9 +1,3 @@
-const MENU = [
-  `watchlist`,
-  `history`,
-  `favorites`
-];
-
 const getAmountFilms = (films) => {
   return films.reduce((accumulator, item) => {
     return {
@@ -14,4 +8,4 @@ const getAmountFilms = (films) => {
   }, {watchlist: 0, favorites: 0, history: 0});
 };
 
-export {MENU, getAmountFilms};
+export {getAmountFilms};

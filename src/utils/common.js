@@ -1,6 +1,6 @@
-import {UserRank, RenderPosition} from "./const";
+import {UserRank} from "../const";
 
-export default class Utils {
+export default class Common {
   static getRandomFloatNumber(min, max) {
     return parseFloat((Math.random() * (max - min) + min).toFixed(1));
   }
@@ -15,7 +15,7 @@ export default class Utils {
 
   static getRandomDate() {
     const targetDate = new Date();
-    const diffValue = Utils.getRandomInteger(0, 10000);
+    const diffValue = Common.getRandomInteger(0, 10000);
 
     targetDate.setDate(targetDate.getDate() - diffValue);
 
@@ -44,27 +44,6 @@ export default class Utils {
     }
 
     return rank;
-  }
-
-  static createElement(template) {
-    const divElement = document.createElement(`div`);
-    divElement.innerHTML = template;
-
-    return divElement.firstElementChild;
-  }
-
-  static render(container, template, position) {
-    switch (position) {
-      case RenderPosition.BEFOREEND:
-        container.append(template);
-        break;
-      case RenderPosition.AFTERBEGIN:
-        container.prepend(template);
-        break;
-      case RenderPosition.AFTEREND:
-        container.after(template);
-        break;
-    }
   }
 
   static isFilmsRating(films) {

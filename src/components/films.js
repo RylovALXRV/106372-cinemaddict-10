@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createNoMoviesMarkup = () => {
   return (
@@ -17,20 +17,9 @@ const createFilmsTemplate = () => {
   );
 };
 
-export default class Films {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Films extends AbstractComponent {
   getTemplate() {
     return createFilmsTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
   }
 
   getFilmsListElement() {
@@ -39,10 +28,6 @@ export default class Films {
 
   getFilmsListContainerElement() {
     return this.getElement().querySelector(`.films-list__container`);
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

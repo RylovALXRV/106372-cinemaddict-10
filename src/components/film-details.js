@@ -1,7 +1,9 @@
-import Utils from "../utils";
+import {RenderPosition} from "../const";
+import Common from "../utils/common";
+import Render from "../utils/render";
 import UserRating from "./user-rating";
 import Comments from "./comments";
-import {RenderPosition} from "../const";
+import AbstractComponent from "./abstract-component";
 
 const generateGenresMarkup = (genres) => {
   return genres.map((genre) => {
@@ -57,7 +59,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${Utils.generateDuration(duration)}</td>
+                  <td class="film-details__cell">${Common.generateDuration(duration)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -90,35 +92,15 @@ export const createFilmDetailsTemplate = (film) => {
   );
 };
 
-const renderUserRatingElement = (filmDetailsComponent) => {
-  const {isHistory} = filmDetailsComponent.getFilm();
-
-  if (isHistory) {
-    Utils.render(filmDetailsComponent.getFilmsFormElement(), new UserRating(filmDetailsComponent.getFilm()).getElement(), RenderPosition.BEFOREEND);
-  }
-};
-
-export const renderFilmDetails = (filmDetailsComponent) => {
-  Utils.render(document.body, filmDetailsComponent.getElement(), RenderPosition.BEFOREEND);
-  renderUserRatingElement(filmDetailsComponent);
-  Utils.render(filmDetailsComponent.getElement(), new Comments(filmDetailsComponent.getFilm()).getElement(), RenderPosition.BEFOREEND);
-};
-
-export default class FilmDetails {
+export default class FilmDetails extends AbstractComponent {
   constructor(film) {
-    this._element = null;
+    super();
+
     this._film = film;
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._film);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = Utils.createElement(this.getTemplate());
-    }
-    return this._element;
   }
 
   getFilmCloseButtonElement() {
@@ -129,11 +111,17 @@ export default class FilmDetails {
     return this.getElement().querySelector(`.film-details__inner`);
   }
 
-  getFilm() {
-    return this._film;
+  _renderUserRatingElement() {
+    const {isHistory} = this._film;
+
+    if (isHistory) {
+      Render.render(this.getFilmsFormElement(), new UserRating(this._film).getElement(), RenderPosition.BEFOREEND);
+    }
   }
 
-  removeElement() {
-    this._element = null;
+  render() {
+    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
+    this._renderUserRatingElement(this.getElement(), this._film);
+    Render.render(this.getElement(), new Comments(this._film).getElement(), RenderPosition.BEFOREEND);
   }
 }

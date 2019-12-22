@@ -13,6 +13,12 @@ const MONTH_NAMES = [
   `December`,
 ];
 
+const MENU = [
+  `watchlist`,
+  `history`,
+  `favorites`
+];
+
 const Film = {
   START: 0,
   END: 2,
@@ -37,4 +43,4 @@ const RenderPosition = {
   BEFOREEND: `beforeend`
 };
 
-export {MONTH_NAMES, Film, UserRank, Description, RenderPosition};
+export {MONTH_NAMES, MENU, Film, UserRank, Description, RenderPosition};
