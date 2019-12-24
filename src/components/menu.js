@@ -1,11 +1,11 @@
-import {MENU} from "../const";
+import {MENU_NAMES} from "../const";
 import {getAmountFilms} from "../mock/menu";
 import AbstractComponent from "./abstract-component";
 
 const createMenuListMarkup = (films) => {
   const amountFilms = getAmountFilms(films);
 
-  return MENU.map((item) => {
+  return MENU_NAMES.map((item) => {
 
     return `<a href="#${item}" class="main-navigation__item">${item[0].toLocaleUpperCase() + item.slice(1)}
               <span class="main-navigation__item-count">${amountFilms[item]}</span>

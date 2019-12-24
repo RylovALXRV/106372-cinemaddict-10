@@ -1,5 +1,4 @@
 import Common from "../utils/common";
-import {MONTH_NAMES} from "../const";
 import {generateComments} from "./comments";
 
 const FilmFeature = {
@@ -37,17 +36,13 @@ const generateFeatures = (features) => {
   return Array.from(uniqueFeatures);
 };
 
-const formatDate = (date) => {
-  return `${date.getDate()} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
-};
-
 const generateFilm = () => {
   const date = Common.getRandomDate();
 
   return {
     duration: Common.getRandomInteger(0, 180),
     rating: Common.getRandomFloatNumber(0, 10),
-    releaseDate: formatDate(date),
+    releaseDate: date,
     title: Common.getRandomElement(FilmFeature.TITLES),
     year: date.getFullYear(),
     genres: generateFeatures(FilmFeature.GENRES),

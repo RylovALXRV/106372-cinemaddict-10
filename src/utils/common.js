@@ -1,4 +1,4 @@
-import {UserRank} from "../const";
+import {MONTH_NAMES, UserRank} from "../const";
 
 export default class Common {
   static getRandomFloatNumber(min, max) {
@@ -66,11 +66,19 @@ export default class Common {
     return filmB.rating - filmA.rating;
   }
 
+  static compareDate(filmA, filmB) {
+    return filmB.releaseDate - filmA.releaseDate;
+  }
+
   static generateDuration(minutes) {
     return `${Math.floor(minutes / 60 || 0)}h ${minutes % 60}m`;
   }
 
   static isEscKeyDown(evt) {
     return evt.key === `Escape` || evt.key === `Esc`;
+  }
+
+  static formatDate(date) {
+    return `${date.getDate()} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
   }
 }

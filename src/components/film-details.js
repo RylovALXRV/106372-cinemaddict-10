@@ -55,7 +55,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${releaseDate}</td>
+                  <td class="film-details__cell">${Common.formatDate(releaseDate)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -103,7 +103,7 @@ export default class FilmDetails extends AbstractComponent {
     return createFilmDetailsTemplate(this._film);
   }
 
-  getFilmCloseButtonElement() {
+  _getFilmCloseButtonElement() {
     return this.getElement().querySelector(`.film-details__close-btn`);
   }
 
@@ -123,5 +123,9 @@ export default class FilmDetails extends AbstractComponent {
     Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
     this._renderUserRatingElement(this.getElement(), this._film);
     Render.render(this.getElement(), new Comments(this._film).getElement(), RenderPosition.BEFOREEND);
+  }
+
+  setClickHandler(handler) {
+    this._getFilmCloseButtonElement().addEventListener(`click`, handler);
   }
 }

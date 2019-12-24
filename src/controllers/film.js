@@ -8,24 +8,13 @@ export default class FilmController {
 
     this._cardFilmComponent = null;
 
-    this.onOpen = onOpen;
+    this._onOpen = onOpen;
   }
 
   render(film) {
     this._cardFilmComponent = new CardFilm(film);
 
-    this._cardFilmComponent.setClickHandler((evt) => {
-      evt.preventDefault();
-      const target = evt.target;
-
-      if (target !== this._cardFilmComponent.getFilmTitleElement() &&
-        target !== this._cardFilmComponent.getFilmPosterElement() &&
-        target !== this._cardFilmComponent.getFilmCommentsElement()) {
-        return;
-      }
-
-      this.onOpen(film, this._cardFilmComponent);
-    });
+    this._cardFilmComponent.setClickHandler(this._onOpen);
 
     Render.render(this._container, this._cardFilmComponent.getElement(), RenderPosition.BEFOREEND);
   }
