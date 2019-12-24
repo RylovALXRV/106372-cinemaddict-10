@@ -39,18 +39,28 @@ export default class CardFilm extends AbstractComponent {
   }
 
   setClickHandler(handler) {
-    this.getElement().addEventListener(`click`, handler);
+    this.getElement().addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      const target = evt.target;
+
+      if (target !== this._getFilmTitleElement() &&
+        target !== this._getFilmPosterElement() &&
+        target !== this._getFilmCommentsElement()) {
+        return;
+      }
+      handler(this._film, this);
+    });
   }
 
-  getFilmPosterElement() {
+  _getFilmPosterElement() {
     return this.getElement().querySelector(`.film-card__poster`);
   }
 
-  getFilmTitleElement() {
+  _getFilmTitleElement() {
     return this.getElement().querySelector(`.film-card__title`);
   }
 
-  getFilmCommentsElement() {
+  _getFilmCommentsElement() {
     return this.getElement().querySelector(`.film-card__comments`);
   }
 }
