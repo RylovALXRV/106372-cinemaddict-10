@@ -1,18 +1,3 @@
-const MONTH_NAMES = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`,
-];
-
 const MENU_NAMES = [
   `watchlist`,
   `history`,
@@ -49,4 +34,4 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
-export {MONTH_NAMES, MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType};
+export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType};

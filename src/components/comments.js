@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-component";
+import Common from "../utils/common";
 
 const createCommentsMarkup = (film) => {
   const {comments} = film;
@@ -15,7 +16,7 @@ const createCommentsMarkup = (film) => {
           <p class="film-details__comment-text">${text}</p>
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${author}</span>
-            <span class="film-details__comment-day">${day}</span>
+            <span class="film-details__comment-day">${Common.formatDate(day)}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
@@ -25,13 +26,13 @@ const createCommentsMarkup = (film) => {
 };
 
 const createCommentsTemplate = (film) => {
+  const {comments} = film;
+
   return (
     `<div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count"></span></h3>
-          <ul class="film-details__comments-list">
-            ${createCommentsMarkup(film)}
-          </ul>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+          <ul class="film-details__comments-list">${createCommentsMarkup(film)}</ul>
 
           <div class="film-details__new-comment">
             <div for="add-emoji" class="film-details__add-emoji-label"></div>
@@ -78,5 +79,3 @@ export default class Comments extends AbstractComponent {
     return createCommentsTemplate(this._film);
   }
 }
-
-export {createCommentsTemplate};
