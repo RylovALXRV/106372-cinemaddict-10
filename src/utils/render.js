@@ -26,4 +26,14 @@ export default class Render {
     component.getElement().remove();
     component.removeElement();
   }
+
+  static replace(newElement, oldElement) {
+    const parentElement = oldElement.parentElement;
+
+    const isExistElements = !!(parentElement && newElement && oldElement);
+
+    if (isExistElements && parentElement.contains(oldElement)) {
+      parentElement.replaceChild(newElement, oldElement);
+    }
+  }
 }

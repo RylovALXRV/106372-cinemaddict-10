@@ -3,7 +3,8 @@ import Common from "../utils/common";
 import Render from "../utils/render";
 import UserRating from "./user-rating";
 import Comments from "./comments";
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
+import {Emoji} from "../mock/comments";
 
 const generateGenresMarkup = (genres) => {
   return genres.map((genre) => {
@@ -13,7 +14,7 @@ const generateGenresMarkup = (genres) => {
 
 export const createFilmDetailsTemplate = (film) => {
   const {title, rating, duration, genres, poster, description, age,
-    director, writers, actors, releaseDate, country} = film;
+    director, writers, actors, releaseDate, country, isWatchlist, isHistory, isFavorites} = film;
 
   return (
     `<section class="film-details">
@@ -55,7 +56,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${Common.formatDate(releaseDate)}</td>
+                  <td class="film-details__cell">${Common.formatReleaseDate(releaseDate)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -77,26 +78,39 @@ export const createFilmDetailsTemplate = (film) => {
           </div>
 
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchlist ? `checked` : ``}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched"  ${isHistory ? `checked` : ``}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite"  ${isFavorites ? `checked` : ``}>
             <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
           </section>
         </div>
     </form>
+    ${(isHistory) ? new UserRating(film).getTemplate() : ``}
+    ${new Comments(film).getTemplate()}
   </section>`
   );
 };
 
-export default class FilmDetails extends AbstractComponent {
-  constructor(film) {
+const createImgEmojiMarkup = (img) => {
+  return `<img src="images/emoji/${img}" width="55" height="55" alt="emoji">`;
+};
+
+export default class FilmDetails extends AbstractSmartComponent {
+  constructor(film, onClose) {
     super();
 
     this._film = film;
+    this._onClose = onClose;
+
+    this._isWatchlist = film.isWatchlist;
+    this._isHistory = film.isHistory;
+    this._isFavorites = film.isFavorites;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
@@ -107,22 +121,56 @@ export default class FilmDetails extends AbstractComponent {
     return this.getElement().querySelector(`.film-details__close-btn`);
   }
 
-  getFilmsFormElement() {
-    return this.getElement().querySelector(`.film-details__inner`);
+  recoveryListeners() {
+    this._subscribeOnEvents();
   }
 
-  _renderUserRatingElement() {
-    const {isHistory} = this._film;
+  reset() {
+    const film = this._film;
 
-    if (isHistory) {
-      Render.render(this.getFilmsFormElement(), new UserRating(this._film).getElement(), RenderPosition.BEFOREEND);
-    }
+    this._isHistory = film._isHistory;
+    this._isWatchlist = film._isWatchlist;
+    this._isFavorites = film._isFavorites;
+
+    this.rerender();
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      const target = evt.target;
+
+      if (target.id === `watched`) {
+        this._film.isHistory = target.checked;
+      }
+
+      if (target.id === `watchlist`) {
+        this._film.isWatchlist = target.checked;
+      }
+
+      if (target.id === `favorite`) {
+        this._film.isFavorites = target.checked;
+      }
+
+      this.rerender();
+    });
+
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      const emojiParentElement = document.querySelector(`.film-details__add-emoji-label`);
+      emojiParentElement.innerHTML = ``;
+
+      Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[evt.target.value.toUpperCase()])),
+          RenderPosition.BEFOREEND);
+
+      // this.rerender();
+    });
+
+    this.setClickHandler(this._onClose);
   }
 
   render() {
     Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
-    this._renderUserRatingElement(this.getElement(), this._film);
-    Render.render(this.getElement(), new Comments(this._film).getElement(), RenderPosition.BEFOREEND);
   }
 
   setClickHandler(handler) {

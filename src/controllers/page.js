@@ -16,7 +16,7 @@ export default class PageController {
 
     this._filmsController = new FilmsController(this._filmsComponent);
 
-    this._sortComponent.setClickSortTypeChangeHandler(this._filmsController.onSortTypeChange);
+    this._sortComponent.setClickSortTypeChangeHandler(this._filmsController._onSortTypeChange);
   }
 
   render() {

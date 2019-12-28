@@ -1,4 +1,5 @@
-import {MONTH_NAMES, UserRank} from "../const";
+import {UserRank} from "../const";
+import moment from "moment";
 
 export default class Common {
   static getRandomFloatNumber(min, max) {
@@ -22,8 +23,12 @@ export default class Common {
     return targetDate;
   }
 
-  static castTimeFormat(value) {
-    return value < 10 ? `0${value}` : String(value);
+  static formatDate(date) {
+    return moment(date).format(`YYYY/MM/DD hh:mm`);
+  }
+
+  static formatReleaseDate(date) {
+    return moment(date).format(`DD MMMM YYYY`);
   }
 
   static isRandomBoolean() {
@@ -78,7 +83,7 @@ export default class Common {
     return evt.key === `Escape` || evt.key === `Esc`;
   }
 
-  static formatDate(date) {
-    return `${date.getDate()} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+  static isActiveButtonClass(isFeature) {
+    return isFeature ? `film-card__controls-item--active` : ``;
   }
 }

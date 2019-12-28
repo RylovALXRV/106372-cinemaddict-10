@@ -3,7 +3,8 @@ import Common from "../utils/common";
 import AbstractComponent from "./abstract-component";
 
 export const createCardFilmTemplate = (film) => {
-  const {title, rating, year, duration, genres, poster, description, comments} = film;
+  const {title, rating, year, duration, genres, poster, description, comments,
+    isWatchlist, isHistory, isFavorites} = film;
   const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
 
   return (
@@ -19,9 +20,9 @@ export const createCardFilmTemplate = (film) => {
           <p class="film-card__description">${descriptionFilm}</p>
           <a class="film-card__comments">${comments.length} comments</a>
           <form class="film-card__controls">
-            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-            <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${Common.isActiveButtonClass(isWatchlist)}">Add to watchlist</button>
+            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${Common.isActiveButtonClass(isHistory)}">Mark as watched</button>
+            <button class="film-card__controls-item button film-card__controls-item--favorite ${Common.isActiveButtonClass(isFavorites)}">Mark as favorite</button>
           </form>
         </article>`
   );
@@ -38,7 +39,7 @@ export default class CardFilm extends AbstractComponent {
     return createCardFilmTemplate(this._film);
   }
 
-  setClickHandler(handler) {
+  setClickOpenPopupHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
       const target = evt.target;
@@ -52,6 +53,18 @@ export default class CardFilm extends AbstractComponent {
     });
   }
 
+  setClickAddWatchlistHandler(handler) {
+    this._getFilmCardControlsElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, handler);
+  }
+
+  setClickMarkAsWatchedHandler(handler) {
+    this._getFilmCardControlsElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, handler);
+  }
+
+  setClickFavoriteHandler(handler) {
+    this._getFilmCardControlsElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, handler);
+  }
+
   _getFilmPosterElement() {
     return this.getElement().querySelector(`.film-card__poster`);
   }
@@ -62,5 +75,9 @@ export default class CardFilm extends AbstractComponent {
 
   _getFilmCommentsElement() {
     return this.getElement().querySelector(`.film-card__comments`);
+  }
+
+  _getFilmCardControlsElement() {
+    return this.getElement().querySelector(`.film-card__controls`);
   }
 }
