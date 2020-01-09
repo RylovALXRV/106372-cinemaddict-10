@@ -4,10 +4,14 @@ import Profile from "./components/profile";
 import FooterStatistics from "./components/footer-statistics";
 import PageController from "./controllers/page";
 import Render from "./utils/render";
+import Films from "./models/films";
 
 const films = generateFilms(Film.COUNT);
 
-Render.render(document.querySelector(`.header`), new Profile(films).getElement(), RenderPosition.BEFOREEND);
-Render.render(document.querySelector(`.footer`), new FooterStatistics(films).getElement(), RenderPosition.BEFOREEND);
+const filmsModel = new Films();
+filmsModel.setFilms(films);
 
-new PageController(document.querySelector(`.main`), films).render();
+Render.render(document.querySelector(`.header`), new Profile(filmsModel.getAllFilms()).getElement(), RenderPosition.BEFOREEND);
+Render.render(document.querySelector(`.footer`), new FooterStatistics(filmsModel.getAllFilms()).getElement(), RenderPosition.BEFOREEND);
+
+new PageController(document.querySelector(`.main`), filmsModel).render();

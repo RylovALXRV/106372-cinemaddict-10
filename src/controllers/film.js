@@ -17,7 +17,7 @@ export default class FilmController {
 
     this._cardFilmComponent = new CardFilm(film);
 
-    this._cardFilmComponent.setClickOpenPopupHandler(this._onOpen);
+    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this));
 
     this._cardFilmComponent.setClickAddWatchlistHandler(() => {
       this._onDataChange(this, film, Object.assign({}, film, {

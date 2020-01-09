@@ -5,7 +5,7 @@ const createCommentsMarkup = (film) => {
   const {comments} = film;
 
   return comments.map((comment) => {
-    const {emoji, text, author, day} = comment;
+    const {emoji, text, author, day, id} = comment;
 
     return (
       `<li class="film-details__comment">
@@ -17,7 +17,7 @@ const createCommentsMarkup = (film) => {
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${author}</span>
             <span class="film-details__comment-day">${Common.formatDate(day)}</span>
-            <button class="film-details__comment-delete">Delete</button>
+            <button class="film-details__comment-delete" id="${id}">Delete</button>
           </p>
         </div>
       </li>`
@@ -77,5 +77,15 @@ export default class Comments extends AbstractComponent {
 
   getTemplate() {
     return createCommentsTemplate(this._film);
+  }
+
+  setCommentDeleteButtonClickHandler(handler) {
+    this.getElement().addEventListener((evt) => {
+      const target = evt.target;
+      if (!target.classList.contains(`film-details__comment-delete`)) {
+        return;
+      }
+      handler(target);
+    });
   }
 }

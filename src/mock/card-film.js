@@ -56,7 +56,8 @@ const generateFilm = () => {
     comments: generateComments(Common.getRandomInteger(0, 5)),
     isWatchlist: Common.isRandomBoolean(),
     isHistory: Common.isRandomBoolean(),
-    isFavorites: Common.isRandomBoolean()
+    isFavorites: Common.isRandomBoolean(),
+    id: String(+new Date() + Math.random())
   };
 };
 

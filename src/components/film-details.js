@@ -6,6 +6,18 @@ import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {Emoji} from "../mock/comments";
 
+const parseFormData = (formData) => {
+  const isWatchlist = formData.get(`watchlist`) === `on` ? Boolean(true) : Boolean(false);
+  const isHistory = formData.get(`watched`) === `on` ? Boolean(true) : Boolean(false);
+  const isFavorites = formData.get(`favorite`) === `on` ? Boolean(true) : Boolean(false);
+
+  return {
+    isWatchlist,
+    isHistory,
+    isFavorites
+  };
+};
+
 const generateGenresMarkup = (genres) => {
   return genres.map((genre) => {
     return `<span class="film-details__genre">${genre}</span>`;
@@ -89,6 +101,7 @@ export const createFilmDetailsTemplate = (film) => {
           </section>
         </div>
     </form>
+    <!-- С этим тоже не понял как правильно сделать. Мне кажется этому здесь не место.  -->
     ${(isHistory) ? new UserRating(film).getTemplate() : ``}
     ${new Comments(film).getTemplate()}
   </section>`
@@ -100,11 +113,13 @@ const createImgEmojiMarkup = (img) => {
 };
 
 export default class FilmDetails extends AbstractSmartComponent {
-  constructor(film, onClose) {
+  constructor(film) {
     super();
 
     this._film = film;
-    this._onClose = onClose;
+
+    this._closeButtonClickHandler = null;
+    this._controlSubmitHandler = null;
 
     this._isWatchlist = film.isWatchlist;
     this._isHistory = film.isHistory;
@@ -121,7 +136,17 @@ export default class FilmDetails extends AbstractSmartComponent {
     return this.getElement().querySelector(`.film-details__close-btn`);
   }
 
+  _getFormElement() {
+    return this.getElement().querySelector(`.film-details__inner`);
+  }
+
+  _getControlsElement() {
+    return this.getElement().querySelector(`.film-details__controls`);
+  }
+
   recoveryListeners() {
+    this.setCloseButtonClickHandler(this._closeButtonClickHandler);
+    this.setControlsChangeHandler(this._controlSubmitHandler);
     this._subscribeOnEvents();
   }
 
@@ -162,18 +187,38 @@ export default class FilmDetails extends AbstractSmartComponent {
 
       Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[evt.target.value.toUpperCase()])),
           RenderPosition.BEFOREEND);
-
-      // this.rerender();
     });
-
-    this.setClickHandler(this._onClose);
   }
 
   render() {
     Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
   }
 
-  setClickHandler(handler) {
+  setCloseButtonClickHandler(handler) {
     this._getFilmCloseButtonElement().addEventListener(`click`, handler);
+
+    this._closeButtonClickHandler = handler;
+  }
+
+  setControlsChangeHandler(handler) {
+    this._getControlsElement().addEventListener(`change`, handler);
+
+    this._controlSubmitHandler = handler;
+  }
+
+  setCommentDeleteButtonClickHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      const target = evt.target;
+      if (!target.classList.contains(`film-details__comment-delete`)) {
+        return;
+      }
+      handler(target);
+    });
+  }
+
+  getData() {
+    const formData = new FormData(this._getFormElement());
+
+    return parseFormData(formData);
   }
 }
