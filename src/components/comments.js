@@ -1,14 +1,11 @@
 import AbstractComponent from "./abstract-component";
 import Common from "../utils/common";
 
-const createCommentsMarkup = (film) => {
-  const {comments} = film;
+export const createCommentMarkup = (comment) => {
+  const {emoji, text, author, day, id} = comment;
 
-  return comments.map((comment) => {
-    const {emoji, text, author, day, id} = comment;
-
-    return (
-      `<li class="film-details__comment">
+  return (
+    `<li class="film-details__comment">
         <span class="film-details__comment-emoji">
           <img src="./images/emoji/${emoji}" width="55" height="55" alt="emoji">
         </span>
@@ -17,11 +14,18 @@ const createCommentsMarkup = (film) => {
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${author}</span>
             <span class="film-details__comment-day">${Common.formatDate(day)}</span>
-            <button class="film-details__comment-delete" id="${id}">Delete</button>
+            <button class="film-details__comment-delete" data-id="${id}">Delete</button>
           </p>
         </div>
       </li>`
-    );
+  );
+};
+
+const createCommentsMarkup = (film) => {
+  const {comments} = film;
+
+  return comments.map((comment) => {
+    return createCommentMarkup(comment);
   }).join(``);
 };
 
@@ -77,15 +81,5 @@ export default class Comments extends AbstractComponent {
 
   getTemplate() {
     return createCommentsTemplate(this._film);
-  }
-
-  setCommentDeleteButtonClickHandler(handler) {
-    this.getElement().addEventListener((evt) => {
-      const target = evt.target;
-      if (!target.classList.contains(`film-details__comment-delete`)) {
-        return;
-      }
-      handler(target);
-    });
   }
 }

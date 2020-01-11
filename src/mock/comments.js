@@ -7,7 +7,7 @@ const Emoji = {
   'ANGRY': `angry.png`
 };
 
-const CommentFeature = {
+export const CommentFeature = {
   'TYPES': [`sleeping`, `smile`, `puke`, `angry`],
   'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
     `Very very old. Meh`, `Almost two hours? Seriously?`,

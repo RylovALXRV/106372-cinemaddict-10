@@ -37,7 +37,6 @@ export default class FilmController {
       }));
     });
 
-
     if (oldCardFilmComponent) {
       Render.replace(this._cardFilmComponent.getElement(), oldCardFilmComponent.getElement());
     } else {

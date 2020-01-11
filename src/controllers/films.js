@@ -1,3 +1,4 @@
+import he from "he";
 import {Film, RenderPosition, SortType} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
@@ -9,24 +10,10 @@ import FilmDetails from "../components/film-details";
 import FilmsRating from "../components/films-rating";
 import FilmController from "./film";
 
-const SortedFilm = {
-  [SortType.DATE_DOWN]: (films) => {
-    return films.slice().sort(Common.compareDate);
-  },
-  [SortType.RATING_DOWN]: (films) => {
-    return films.slice().sort(Common.compareRating);
-  },
-  [SortType.DEFAULT]: (films) => {
-    return films;
-  }
-};
-
 export default class FilmsController {
   constructor(container, filmsModel) {
     this._container = container;
     this._filmsModel = filmsModel;
-
-    this._sortedFilms = [];
 
     this._filmsRatingComponent = new FilmsRating();
     this._filmsCommentComponent = new FilmsComments();
@@ -52,21 +39,19 @@ export default class FilmsController {
   }
 
   _onSortTypeChange(sortType) {
-    const films = this._filmsModel.getFilms();
-
     if (sortType === SortType.DEFAULT) {
       this._filmsCount = Film.SHOW;
     }
 
-    this._sortedFilms = SortedFilm[sortType](films);
+    const sortedFilms = this._filmsModel.getSortedFilms(sortType);
 
     const filmsContainer = document.querySelector(`.films-list__container`);
     filmsContainer.innerHTML = ``;
 
-    this._renderFilms(this._sortedFilms, filmsContainer, Film.START, this._filmsCount);
+    this._renderFilms(sortedFilms, filmsContainer, Film.START, this._filmsCount);
 
-    if (this._filmsCount < films.length) {
-      this._renderButtonShowMore(this._sortedFilms);
+    if (this._filmsCount < sortedFilms.length) {
+      this._renderButtonShowMore(sortedFilms);
     }
   }
 
@@ -156,9 +141,34 @@ export default class FilmsController {
       this._onDataChange(filmController, film, Object.assign({}, film, data));
     });
 
-    this._filmDetailsComponent.setCommentDeleteButtonClickHandler();
+    this._filmDetailsComponent.setCommentDeleteButtonClickHandler((commentId) => {
+      const filmComments = this._filmsModel.deleteCommentFilm(film, commentId);
+      this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
+    });
 
-    this._filmDetailsComponent.render(film);
+    this._filmDetailsComponent.setCommentAddKeydownHandler(() => {
+      const imgElement = document.querySelector(`.film-details__add-emoji-label img`);
+      const text = he.encode(document.querySelector(`.film-details__comment-input`).value);
+
+      if (!imgElement || text === ``) {
+        return;
+      }
+
+      const img = imgElement.src.split(`/`);
+
+      const comment = {
+        emoji: img[img.length - 1],
+        text,
+        author: ``,
+        day: Common.formatDate(new Date()),
+        id: String(+new Date() + Math.random())
+      };
+
+      const filmComments = this._filmsModel.addCommentFilm(film, comment);
+      this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
+    });
+
+    this._filmDetailsComponent.render();
     document.body.classList.add(`hide-overflow`);
     document.addEventListener(`keydown`, this.onEscKeydown);
   }

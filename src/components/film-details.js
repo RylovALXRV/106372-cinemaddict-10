@@ -1,4 +1,4 @@
-import {RenderPosition} from "../const";
+import {FilterType, RenderPosition} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import UserRating from "./user-rating";
@@ -7,7 +7,7 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import {Emoji} from "../mock/comments";
 
 const parseFormData = (formData) => {
-  const isWatchlist = formData.get(`watchlist`) === `on` ? Boolean(true) : Boolean(false);
+  const isWatchlist = formData.get(FilterType.WATCHLIST) === `on` ? Boolean(true) : Boolean(false);
   const isHistory = formData.get(`watched`) === `on` ? Boolean(true) : Boolean(false);
   const isFavorites = formData.get(`favorite`) === `on` ? Boolean(true) : Boolean(false);
 
@@ -22,6 +22,16 @@ const generateGenresMarkup = (genres) => {
   return genres.map((genre) => {
     return `<span class="film-details__genre">${genre}</span>`;
   }).join(``);
+};
+
+const deleteComment = (target, selector) => {
+  let parent = target.parentElement;
+  while (parent) {
+    if (parent.classList.contains(selector)) {
+      parent.remove();
+    }
+    parent = parent.parentElement;
+  }
 };
 
 export const createFilmDetailsTemplate = (film) => {
@@ -101,7 +111,6 @@ export const createFilmDetailsTemplate = (film) => {
           </section>
         </div>
     </form>
-    <!-- С этим тоже не понял как правильно сделать. Мне кажется этому здесь не место.  -->
     ${(isHistory) ? new UserRating(film).getTemplate() : ``}
     ${new Comments(film).getTemplate()}
   </section>`
@@ -120,6 +129,8 @@ export default class FilmDetails extends AbstractSmartComponent {
 
     this._closeButtonClickHandler = null;
     this._controlSubmitHandler = null;
+    this._commentDeleteButtonClick = null;
+    this._currentImg = null;
 
     this._isWatchlist = film.isWatchlist;
     this._isHistory = film.isHistory;
@@ -145,9 +156,10 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   recoveryListeners() {
+    this._subscribeOnEvents();
     this.setCloseButtonClickHandler(this._closeButtonClickHandler);
     this.setControlsChangeHandler(this._controlSubmitHandler);
-    this._subscribeOnEvents();
+    this.setCommentDeleteButtonClickHandler(this._commentDeleteButtonClick);
   }
 
   reset() {
@@ -168,6 +180,7 @@ export default class FilmDetails extends AbstractSmartComponent {
 
       if (target.id === `watched`) {
         this._film.isHistory = target.checked;
+        this.rerender();
       }
 
       if (target.id === `watchlist`) {
@@ -177,17 +190,30 @@ export default class FilmDetails extends AbstractSmartComponent {
       if (target.id === `favorite`) {
         this._film.isFavorites = target.checked;
       }
-
-      this.rerender();
     });
 
     element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      this._currentImg = evt.target;
+
       const emojiParentElement = document.querySelector(`.film-details__add-emoji-label`);
       emojiParentElement.innerHTML = ``;
 
       Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[evt.target.value.toUpperCase()])),
           RenderPosition.BEFOREEND);
     });
+
+    element.addEventListener(`click`, (evt) => {
+      const target = evt.target;
+      if (target.classList.contains(`film-details__comment-delete`)) {
+        deleteComment(target, `film-details__comment`);
+
+        document.querySelector(`.film-details__comments-count`).textContent =
+          document.querySelectorAll(`.film-details__comment`).length;
+      }
+    });
+
+    // ????
+    element.addEventListener(`keydown`, () => {});
   }
 
   render() {
@@ -212,7 +238,17 @@ export default class FilmDetails extends AbstractSmartComponent {
       if (!target.classList.contains(`film-details__comment-delete`)) {
         return;
       }
-      handler(target);
+      handler(target.dataset.id);
+    });
+
+    this._commentDeleteButtonClick = handler;
+  }
+
+  setCommentAddKeydownHandler(handler) {
+    this.getElement().addEventListener(`keydown`, (evt) => {
+      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
+        handler();
+      }
     });
   }
 
