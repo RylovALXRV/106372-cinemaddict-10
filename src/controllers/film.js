@@ -1,12 +1,14 @@
 import CardFilm from "../components/card-film";
 import Render from "../utils/render";
 import {RenderPosition} from "../const";
+import FilmDetails from "../components/film-details";
 
 export default class FilmController {
   constructor(container, onOpen, onDataChange) {
     this._container = container;
 
     this._cardFilmComponent = null;
+    this._editCardFilmComponent = null;
 
     this._onOpen = onOpen;
     this._onDataChange = onDataChange;
@@ -16,8 +18,9 @@ export default class FilmController {
     const oldCardFilmComponent = this._cardFilmComponent;
 
     this._cardFilmComponent = new CardFilm(film);
+    this._editCardFilmComponent = new FilmDetails(film);
 
-    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this));
+    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this._editCardFilmComponent, this));
 
     this._cardFilmComponent.setClickAddWatchlistHandler(() => {
       this._onDataChange(this, film, Object.assign({}, film, {

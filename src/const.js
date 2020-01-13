@@ -2,7 +2,8 @@ const FilterType = {
   ALL: `all`,
   WATCHLIST: `watchlist`,
   HISTORY: `history`,
-  FAVORITES: `favorites`
+  FAVORITES: `favorites`,
+  STATS: `stats`
 };
 
 const MENU_NAMES = [

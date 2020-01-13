@@ -21,22 +21,18 @@ export const createCommentMarkup = (comment) => {
   );
 };
 
-const createCommentsMarkup = (film) => {
-  const {comments} = film;
-
+const createCommentsMarkup = (comments) => {
   return comments.map((comment) => {
     return createCommentMarkup(comment);
   }).join(``);
 };
 
-const createCommentsTemplate = (film) => {
-  const {comments} = film;
-
+const createCommentsTemplate = (comments) => {
   return (
     `<div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-          <ul class="film-details__comments-list">${createCommentsMarkup(film)}</ul>
+          <ul class="film-details__comments-list">${createCommentsMarkup(comments)}</ul>
 
           <div class="film-details__new-comment">
             <div for="add-emoji" class="film-details__add-emoji-label"></div>

@@ -6,7 +6,6 @@ import {getAmountFilms} from "../mock/menu";
 import {createNoMoviesMarkup} from "../components/films";
 import ButtonShowMore from "../components/button-show-more";
 import FilmsComments from "../components/films-comments";
-import FilmDetails from "../components/film-details";
 import FilmsRating from "../components/films-rating";
 import FilmController from "./film";
 
@@ -20,7 +19,7 @@ export default class FilmsController {
     this._buttonShowMoreComponent = new ButtonShowMore();
 
     this._currentFilm = null;
-    this._filmDetailsComponent = null;
+    this._currentEditFilm = null;
 
     this._filmsCount = Film.SHOW;
 
@@ -111,16 +110,14 @@ export default class FilmsController {
   }
 
   _onClose() {
-    this._filmDetailsComponent.reset();
-
-    Render.remove(this._filmDetailsComponent);
+    Render.remove(this._currentEditFilm);
     document.body.classList.remove(`hide-overflow`);
     document.removeEventListener(`keydown`, this.onEscKeydown);
 
     this._currentFilm = null;
   }
 
-  _onOpen(film, filmComponent, filmController) {
+  _onOpen(film, filmComponent, editFilmComponent, filmController) {
     if (filmComponent.getElement() === this._currentFilm) {
       return;
     }
@@ -129,24 +126,24 @@ export default class FilmsController {
       this._onClose();
     }
 
-    this._filmDetailsComponent = new FilmDetails(film);
     this._currentFilm = filmComponent.getElement();
+    this._currentEditFilm = editFilmComponent;
 
-    this._filmDetailsComponent.setCloseButtonClickHandler(() => {
+    this._currentEditFilm.setCloseButtonClickHandler(() => {
       this._onClose();
     });
 
-    this._filmDetailsComponent.setControlsChangeHandler(() => {
-      const data = this._filmDetailsComponent.getData();
+    this._currentEditFilm.setControlsChangeHandler(() => {
+      const data = this._currentEditFilm.getData();
       this._onDataChange(filmController, film, Object.assign({}, film, data));
     });
 
-    this._filmDetailsComponent.setCommentDeleteButtonClickHandler((commentId) => {
+    this._currentEditFilm.setCommentDeleteButtonClickHandler((commentId) => {
       const filmComments = this._filmsModel.deleteCommentFilm(film, commentId);
       this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
     });
 
-    this._filmDetailsComponent.setCommentAddKeydownHandler(() => {
+    this._currentEditFilm.setCommentAddKeydownHandler(() => {
       const imgElement = document.querySelector(`.film-details__add-emoji-label img`);
       const text = he.encode(document.querySelector(`.film-details__comment-input`).value);
 
@@ -161,14 +158,14 @@ export default class FilmsController {
         text,
         author: ``,
         day: Common.formatDate(new Date()),
-        id: String(+new Date() + Math.random())
+        id: String(Date.now() + Math.random())
       };
 
       const filmComments = this._filmsModel.addCommentFilm(film, comment);
       this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
     });
 
-    this._filmDetailsComponent.render();
+    this._currentEditFilm.render();
     document.body.classList.add(`hide-overflow`);
     document.addEventListener(`keydown`, this.onEscKeydown);
   }

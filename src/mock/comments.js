@@ -21,7 +21,7 @@ const generateComment = () => {
     text: Common.getRandomElement(CommentFeature.TEXTS),
     author: Common.getRandomElement(CommentFeature.AUTHORS),
     day: Common.getRandomDate(),
-    id: String(+new Date() + Math.random())
+    id: String(Date.now() + Math.random())
   };
 };
 

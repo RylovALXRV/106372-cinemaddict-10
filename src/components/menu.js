@@ -1,4 +1,4 @@
-import {MENU_NAMES} from "../const";
+import {FilterType, MENU_NAMES} from "../const";
 import AbstractComponent from "./abstract-component";
 
 const createMenuListMarkup = (filters) => {
@@ -9,13 +9,12 @@ const createMenuListMarkup = (filters) => {
   }).join(``);
 };
 
-// здесь не понял про активный элемент
 const createMenuTemplate = (films) => {
   return (
     `<nav class="main-navigation">
       <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
       ${createMenuListMarkup(films)}
-      <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
+      <a href="#${FilterType.STATS}" class="main-navigation__item main-navigation__item--additional" data-filter-type="${FilterType.STATS}">Stats</a>
     </nav>`
   );
 };

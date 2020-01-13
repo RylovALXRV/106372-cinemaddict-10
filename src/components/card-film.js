@@ -13,7 +13,7 @@ export const createCardFilmTemplate = (film) => {
           <p class="film-card__rating">${rating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${year}</span>
-            <span class="film-card__duration">${Common.generateDuration(duration)}</span>
+            <span class="film-card__duration">${Common.generateHours(duration)}h ${Common.generateMinutes(duration)}m</span>
             <span class="film-card__genre">${genres.join(` `)}</span>
           </p>
           <img src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">

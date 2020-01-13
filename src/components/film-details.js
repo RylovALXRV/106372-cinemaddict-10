@@ -1,4 +1,4 @@
-import {FilterType, RenderPosition} from "../const";
+import {RenderPosition} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import UserRating from "./user-rating";
@@ -6,10 +6,16 @@ import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {Emoji} from "../mock/comments";
 
+const FilterValue = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
+};
+
 const parseFormData = (formData) => {
-  const isWatchlist = formData.get(FilterType.WATCHLIST) === `on` ? Boolean(true) : Boolean(false);
-  const isHistory = formData.get(`watched`) === `on` ? Boolean(true) : Boolean(false);
-  const isFavorites = formData.get(`favorite`) === `on` ? Boolean(true) : Boolean(false);
+  const isWatchlist = formData.get(FilterValue.WATCHLIST) === `on` ? Boolean(true) : Boolean(false);
+  const isHistory = formData.get(FilterValue.WATCHED) === `on` ? Boolean(true) : Boolean(false);
+  const isFavorites = formData.get(FilterValue.FAVORITE) === `on` ? Boolean(true) : Boolean(false);
 
   return {
     isWatchlist,
@@ -24,19 +30,10 @@ const generateGenresMarkup = (genres) => {
   }).join(``);
 };
 
-const deleteComment = (target, selector) => {
-  let parent = target.parentElement;
-  while (parent) {
-    if (parent.classList.contains(selector)) {
-      parent.remove();
-    }
-    parent = parent.parentElement;
-  }
-};
-
-export const createFilmDetailsTemplate = (film) => {
+export const createFilmDetailsTemplate = (film, options = {}) => {
   const {title, rating, duration, genres, poster, description, age,
-    director, writers, actors, releaseDate, country, isWatchlist, isHistory, isFavorites} = film;
+    director, writers, actors, releaseDate, country} = film;
+  const {isHistory, isWatchlist, isFavorites, comments} = options;
 
   return (
     `<section class="film-details">
@@ -82,7 +79,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${Common.generateDuration(duration)}</td>
+                  <td class="film-details__cell">${Common.generateHours(duration)}h ${Common.generateMinutes(duration)}m</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -112,7 +109,7 @@ export const createFilmDetailsTemplate = (film) => {
         </div>
     </form>
     ${(isHistory) ? new UserRating(film).getTemplate() : ``}
-    ${new Comments(film).getTemplate()}
+    ${new Comments(comments).getTemplate()}
   </section>`
   );
 };
@@ -129,18 +126,24 @@ export default class FilmDetails extends AbstractSmartComponent {
 
     this._closeButtonClickHandler = null;
     this._controlSubmitHandler = null;
-    this._commentDeleteButtonClick = null;
+    this._commentDeleteButtonClickHandler = null;
     this._currentImg = null;
 
     this._isWatchlist = film.isWatchlist;
     this._isHistory = film.isHistory;
     this._isFavorites = film.isFavorites;
+    this._comments = film.comments;
 
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmDetailsTemplate(this._film, {
+      isHistory: this._isHistory,
+      isWatchlist: this._isWatchlist,
+      isFavorites: this._isFavorites,
+      comments: this._comments
+    });
   }
 
   _getFilmCloseButtonElement() {
@@ -159,65 +162,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._subscribeOnEvents();
     this.setCloseButtonClickHandler(this._closeButtonClickHandler);
     this.setControlsChangeHandler(this._controlSubmitHandler);
-    this.setCommentDeleteButtonClickHandler(this._commentDeleteButtonClick);
-  }
-
-  reset() {
-    const film = this._film;
-
-    this._isHistory = film._isHistory;
-    this._isWatchlist = film._isWatchlist;
-    this._isFavorites = film._isFavorites;
-
-    this.rerender();
-  }
-
-  _subscribeOnEvents() {
-    const element = this.getElement();
-
-    element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
-      const target = evt.target;
-
-      if (target.id === `watched`) {
-        this._film.isHistory = target.checked;
-        this.rerender();
-      }
-
-      if (target.id === `watchlist`) {
-        this._film.isWatchlist = target.checked;
-      }
-
-      if (target.id === `favorite`) {
-        this._film.isFavorites = target.checked;
-      }
-    });
-
-    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
-      this._currentImg = evt.target;
-
-      const emojiParentElement = document.querySelector(`.film-details__add-emoji-label`);
-      emojiParentElement.innerHTML = ``;
-
-      Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[evt.target.value.toUpperCase()])),
-          RenderPosition.BEFOREEND);
-    });
-
-    element.addEventListener(`click`, (evt) => {
-      const target = evt.target;
-      if (target.classList.contains(`film-details__comment-delete`)) {
-        deleteComment(target, `film-details__comment`);
-
-        document.querySelector(`.film-details__comments-count`).textContent =
-          document.querySelectorAll(`.film-details__comment`).length;
-      }
-    });
-
-    // ????
-    element.addEventListener(`keydown`, () => {});
-  }
-
-  render() {
-    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
+    this.setCommentDeleteButtonClickHandler(this._commentDeleteButtonClickHandler);
   }
 
   setCloseButtonClickHandler(handler) {
@@ -238,10 +183,11 @@ export default class FilmDetails extends AbstractSmartComponent {
       if (!target.classList.contains(`film-details__comment-delete`)) {
         return;
       }
+
       handler(target.dataset.id);
     });
 
-    this._commentDeleteButtonClick = handler;
+    this._commentDeleteButtonClickHandler = handler;
   }
 
   setCommentAddKeydownHandler(handler) {
@@ -256,5 +202,54 @@ export default class FilmDetails extends AbstractSmartComponent {
     const formData = new FormData(this._getFormElement());
 
     return parseFormData(formData);
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      const target = evt.target;
+
+      if (target.id === FilterValue.WATCHED) {
+        this._isHistory = this._film.isHistory;
+        // this.rerender();
+      }
+
+      if (target.id === FilterValue.WATCHLIST) {
+        this._isWatchlist = this._film.isWatchlist;
+      }
+
+      if (target.id === FilterValue.FAVORITE) {
+        this._isFavorites = this._film.isFavorites;
+      }
+    });
+
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      const emojiParentElement = document.querySelector(`.film-details__add-emoji-label`);
+      emojiParentElement.innerHTML = ``;
+
+      Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[evt.target.value.toUpperCase()])),
+          RenderPosition.BEFOREEND);
+    });
+
+    element.addEventListener(`click`, (evt) => {
+      const target = evt.target;
+      if (target.classList.contains(`film-details__comment-delete`)) {
+        this._comments = this._film.comments;
+        // this.rerender();
+      }
+    });
+
+
+    element.addEventListener(`keydown`, (evt) => {
+      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
+        this._comments = this._film.comments;
+        // this.rerender();
+      }
+    });
+  }
+
+  render() {
+    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
   }
 }
