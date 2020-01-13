@@ -212,7 +212,7 @@ export default class FilmDetails extends AbstractSmartComponent {
 
       if (target.id === FilterValue.WATCHED) {
         this._isHistory = this._film.isHistory;
-        // this.rerender();
+        this.rerender();
       }
 
       if (target.id === FilterValue.WATCHLIST) {
@@ -236,7 +236,7 @@ export default class FilmDetails extends AbstractSmartComponent {
       const target = evt.target;
       if (target.classList.contains(`film-details__comment-delete`)) {
         this._comments = this._film.comments;
-        // this.rerender();
+        this.rerender();
       }
     });
 
