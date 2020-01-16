@@ -125,7 +125,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._film = film;
 
     this._closeButtonClickHandler = null;
-    this._controlSubmitHandler = null;
+    this._controlChangeHandler = null;
     this._commentDeleteButtonClickHandler = null;
     this._currentImg = null;
 
@@ -158,10 +158,14 @@ export default class FilmDetails extends AbstractSmartComponent {
     return this.getElement().querySelector(`.film-details__controls`);
   }
 
+  setCommentDeleteButtonClickHandler(handler) {
+    this._commentDeleteButtonClickHandler = handler;
+  }
+
   recoveryListeners() {
     this._subscribeOnEvents();
     this.setCloseButtonClickHandler(this._closeButtonClickHandler);
-    this.setControlsChangeHandler(this._controlSubmitHandler);
+    this.setControlsChangeHandler(this._controlChangeHandler);
     this.setCommentDeleteButtonClickHandler(this._commentDeleteButtonClickHandler);
   }
 
@@ -174,40 +178,15 @@ export default class FilmDetails extends AbstractSmartComponent {
   setControlsChangeHandler(handler) {
     this._getControlsElement().addEventListener(`change`, handler);
 
-    this._controlSubmitHandler = handler;
-  }
-
-  setCommentDeleteButtonClickHandler(handler) {
-    this.getElement().addEventListener(`click`, (evt) => {
-      const target = evt.target;
-      if (!target.classList.contains(`film-details__comment-delete`)) {
-        return;
-      }
-
-      handler(target.dataset.id);
-    });
-
-    this._commentDeleteButtonClickHandler = handler;
-  }
-
-  setCommentAddKeydownHandler(handler) {
-    this.getElement().addEventListener(`keydown`, (evt) => {
-      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
-        handler();
-      }
-    });
-  }
-
-  getData() {
-    const formData = new FormData(this._getFormElement());
-
-    return parseFormData(formData);
+    this._controlChangeHandler = handler;
   }
 
   _subscribeOnEvents() {
     const element = this.getElement();
 
     element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      this._controlChangeHandler();
+
       const target = evt.target;
 
       if (target.id === FilterValue.WATCHED) {
@@ -236,17 +215,31 @@ export default class FilmDetails extends AbstractSmartComponent {
       const target = evt.target;
       if (target.classList.contains(`film-details__comment-delete`)) {
         this._comments = this._film.comments;
+        this._commentDeleteButtonClickHandler(target.dataset.id);
+
         this.rerender();
       }
     });
 
-
     element.addEventListener(`keydown`, (evt) => {
       if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
         this._comments = this._film.comments;
-        // this.rerender();
       }
     });
+  }
+
+  setCommentAddKeydownHandler(handler) {
+    this.getElement().addEventListener(`keydown`, (evt) => {
+      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
+        handler();
+      }
+    });
+  }
+
+  getData() {
+    const formData = new FormData(this._getFormElement());
+
+    return parseFormData(formData);
   }
 
   render() {
