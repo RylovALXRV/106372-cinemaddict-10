@@ -1,7 +1,15 @@
+const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchlist`,
+  HISTORY: `history`,
+  FAVORITES: `favorites`,
+  STATS: `stats`
+};
+
 const MENU_NAMES = [
-  `watchlist`,
-  `history`,
-  `favorites`
+  FilterType.WATCHLIST,
+  FilterType.HISTORY,
+  FilterType.FAVORITES
 ];
 
 const Film = {
@@ -34,4 +42,4 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
-export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType};
+export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType};

@@ -75,8 +75,12 @@ export default class Common {
     return filmB.releaseDate - filmA.releaseDate;
   }
 
-  static generateDuration(minutes) {
-    return `${Math.floor(minutes / 60 || 0)}h ${minutes % 60}m`;
+  static generateHours(minutes) {
+    return Math.floor(minutes / 60 || 0);
+  }
+
+  static generateMinutes(minutes) {
+    return minutes % 60;
   }
 
   static isEscKeyDown(evt) {

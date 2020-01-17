@@ -1,7 +1,5 @@
 import Common from "../utils/common";
 
-// переделал типы эмоций по новому ТЗ, но шаблоны старые, поэтому при нажатии на эмоцию
-// в комментарии - не вставляются/не появляются правильные смайлы
 const Emoji = {
   'SLEEPING': `sleeping.png`,
   'SMILE': `smile.png`,
@@ -22,7 +20,8 @@ const generateComment = () => {
     emoji: Emoji[Common.getRandomElement(CommentFeature.TYPES).toLocaleUpperCase()],
     text: Common.getRandomElement(CommentFeature.TEXTS),
     author: Common.getRandomElement(CommentFeature.AUTHORS),
-    day: Common.getRandomDate()
+    day: Common.getRandomDate(),
+    id: String(Date.now() + Math.random())
   };
 };
 
@@ -30,4 +29,4 @@ const generateComments = (count) => {
   return new Array(count).fill(``).map(generateComment);
 };
 
-export {generateComments, Emoji};
+export {generateComments, Emoji, CommentFeature};
