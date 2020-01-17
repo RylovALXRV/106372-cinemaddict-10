@@ -7,7 +7,7 @@ const Emoji = {
   'ANGRY': `angry.png`
 };
 
-export const CommentFeature = {
+const CommentFeature = {
   'TYPES': [`sleeping`, `smile`, `puke`, `angry`],
   'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
     `Very very old. Meh`, `Almost two hours? Seriously?`,
@@ -29,4 +29,4 @@ const generateComments = (count) => {
   return new Array(count).fill(``).map(generateComment);
 };
 
-export {generateComments, Emoji};
+export {generateComments, Emoji, CommentFeature};

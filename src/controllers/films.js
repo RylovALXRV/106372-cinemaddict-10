@@ -4,10 +4,12 @@ import Common from "../utils/common";
 import Render from "../utils/render";
 import {getAmountFilms} from "../mock/menu";
 import {createNoMoviesMarkup} from "../components/films";
+import {createImgEmojiMarkup} from "../components/film-details";
 import ButtonShowMore from "../components/button-show-more";
 import FilmsComments from "../components/films-comments";
 import FilmsRating from "../components/films-rating";
 import FilmController from "./film";
+import {Emoji, CommentFeature} from "../mock/comments";
 
 export default class FilmsController {
   constructor(container, filmsModel) {
@@ -129,12 +131,10 @@ export default class FilmsController {
     this._currentFilm = filmComponent.getElement();
     this._currentEditFilm = editFilmComponent;
 
-    this._currentEditFilm.setCloseButtonClickHandler(() => {
-      this._onClose();
-    });
+    this._currentEditFilm.setCloseButtonClickHandler(this._onClose);
 
     this._currentEditFilm.setControlsChangeHandler(() => {
-      const data = this._currentEditFilm.getData();
+      const data = this._currentEditFilm.getData(film);
       this._onDataChange(filmController, film, Object.assign({}, film, data));
     });
 
@@ -144,8 +144,8 @@ export default class FilmsController {
     });
 
     this._currentEditFilm.setCommentAddKeydownHandler(() => {
-      const imgElement = document.querySelector(`.film-details__add-emoji-label img`);
-      const text = he.encode(document.querySelector(`.film-details__comment-input`).value);
+      const imgElement = this._currentEditFilm.getEmojiPictureElement();
+      const text = he.encode(this._currentEditFilm.getCommentInputElement().value);
 
       if (!imgElement || text === ``) {
         return;
@@ -156,13 +156,23 @@ export default class FilmsController {
       const comment = {
         emoji: img[img.length - 1],
         text,
-        author: ``,
+        author: Common.getRandomElement(CommentFeature.AUTHORS),
         day: Common.formatDate(new Date()),
         id: String(Date.now() + Math.random())
       };
 
       const filmComments = this._filmsModel.addCommentFilm(film, comment);
-      this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
+      this._onDataChange(filmController, film, Object.assign({}, film, {
+        comments: filmComments
+      }));
+    });
+
+    this._currentEditFilm.setEmojiChangeHandler((img) => {
+      const emojiParentElement = this._currentEditFilm.getEmojiLabelElement();
+      emojiParentElement.innerHTML = ``;
+
+      Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[img.value.toUpperCase()])),
+          RenderPosition.BEFOREEND);
     });
 
     this._currentEditFilm.render();
