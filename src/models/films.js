@@ -1,6 +1,7 @@
 import {FilterType} from "../const";
 import {getFilmsByFilter} from "../utils/filter";
 import {getFilmsBySort} from "../utils/sort";
+import {getWatchedFilmsByFilter} from "../utils/statistics";
 
 export default class Films {
   constructor() {
@@ -22,6 +23,10 @@ export default class Films {
 
   getSortedFilms(sortType) {
     return getFilmsBySort(this.getFilms(), sortType);
+  }
+
+  getWatchedFilms(films, sortType) {
+    return getWatchedFilmsByFilter(films, sortType);
   }
 
   getAllFilms() {

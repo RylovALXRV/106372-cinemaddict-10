@@ -12,6 +12,22 @@ const MENU_NAMES = [
   FilterType.FAVORITES
 ];
 
+const StatisticsFilterValue = {
+  ALL_TIME: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};
+
+const STATISTICS_PERIOD = [
+  StatisticsFilterValue.ALL_TIME,
+  StatisticsFilterValue.TODAY,
+  StatisticsFilterValue.WEEK,
+  StatisticsFilterValue.MONTH,
+  StatisticsFilterValue.YEAR
+];
+
 const Film = {
   START: 0,
   END: 2,
@@ -42,4 +58,5 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
-export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType};
+export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
+  StatisticsFilterValue, STATISTICS_PERIOD};

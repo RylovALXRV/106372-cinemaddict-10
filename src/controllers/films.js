@@ -1,4 +1,3 @@
-import he from "he";
 import {Film, RenderPosition, SortType} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
@@ -143,14 +142,7 @@ export default class FilmsController {
       this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
     });
 
-    this._currentEditFilm.setCommentAddKeydownHandler(() => {
-      const imgElement = this._currentEditFilm.getEmojiPictureElement();
-      const text = he.encode(this._currentEditFilm.getCommentInputElement().value);
-
-      if (!imgElement || text === ``) {
-        return;
-      }
-
+    this._currentEditFilm.setCommentAddKeydownHandler((text, imgElement) => {
       const img = imgElement.src.split(`/`);
 
       const comment = {

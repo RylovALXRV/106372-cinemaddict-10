@@ -38,6 +38,7 @@ const generateFeatures = (features) => {
 
 const generateFilm = () => {
   const date = Common.getRandomDate();
+  const isHistory = Common.isRandomBoolean();
 
   return {
     duration: Common.getRandomInteger(0, 180),
@@ -55,9 +56,10 @@ const generateFilm = () => {
     country: Common.getRandomElement(FilmFeature.COUNTRIES),
     comments: generateComments(Common.getRandomInteger(0, 5)),
     isWatchlist: Common.isRandomBoolean(),
-    isHistory: Common.isRandomBoolean(),
+    isHistory,
     isFavorites: Common.isRandomBoolean(),
-    id: String(+new Date() + Math.random())
+    id: String(+new Date() + Math.random()),
+    watchingDate: isHistory ? date : ``
   };
 };
 
