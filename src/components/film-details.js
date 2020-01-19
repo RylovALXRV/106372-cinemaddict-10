@@ -4,6 +4,7 @@ import Render from "../utils/render";
 import UserRating from "./user-rating";
 import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
+import he from "he";
 
 const FilterValue = {
   WATCHLIST: `watchlist`,
@@ -19,6 +20,7 @@ const parseFormData = (film, formData) => {
   film.isWatchlist = isWatchlist;
   film.isHistory = isHistory;
   film.isFavorites = isFavorites;
+  film.watchingDate = film.isHistory ? new Date() : ``;
 
   return film;
 };
@@ -183,8 +185,11 @@ export default class FilmDetails extends AbstractSmartComponent {
     });
 
     element.addEventListener(`keydown`, (evt) => {
-      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter`) {
-        this._addComment();
+      const text = he.encode(this._getCommentInputElement().value);
+      const imgElement = this.getEmojiPictureElement();
+
+      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter` && text && imgElement) {
+        this._addComment(text, imgElement);
 
         this.rerender();
       }
@@ -199,14 +204,14 @@ export default class FilmDetails extends AbstractSmartComponent {
     return this.getElement().querySelector(`.film-details__inner`);
   }
 
+  _getCommentInputElement() {
+    return this.getElement().querySelector(`.film-details__comment-input`);
+  }
+
   getData(film) {
     const formData = new FormData(this._getFormElement());
 
     return parseFormData(film, formData);
-  }
-
-  getCommentInputElement() {
-    return this.getElement().querySelector(`.film-details__comment-input`);
   }
 
   getEmojiLabelElement() {

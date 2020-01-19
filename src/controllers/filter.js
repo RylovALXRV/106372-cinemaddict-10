@@ -4,9 +4,10 @@ import Menu from "../components/menu";
 import Render from "../utils/render";
 
 export default class FilterController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, onSwitchScreens) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._onSwitchScreens = onSwitchScreens;
 
     this._activeFilterType = null;
     this._filterComponent = null;
@@ -36,6 +37,7 @@ export default class FilterController {
 
   _onFilterChange(filterType) {
     this._filmsModel.setFilter(filterType);
+    this._onSwitchScreens(filterType);
     this._activeFilterType = filterType;
   }
 

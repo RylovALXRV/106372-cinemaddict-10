@@ -29,8 +29,11 @@ export default class FilmController {
     });
 
     this._cardFilmComponent.setClickMarkAsWatchedHandler(() => {
+      const isHistory = !film.isHistory;
+
       this._onDataChange(this, film, Object.assign({}, film, {
-        isHistory: !film.isHistory,
+        isHistory,
+        watchingDate: isHistory ? new Date() : ``
       }));
     });
 
