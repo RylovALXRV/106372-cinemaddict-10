@@ -1,13 +1,20 @@
 import AbstractComponent from "./abstract-component";
 import Common from "../utils/common";
 
+const Emoji = {
+  'SLEEPING': `sleeping.png`,
+  'SMILE': `smile.png`,
+  'PUKE': `puke.png`,
+  'ANGRY': `angry.png`
+};
+
 export const createCommentMarkup = (comment) => {
-  const {emoji, text, author, day, id} = comment;
+  const {emotion, comment: text, author, day, id} = comment;
 
   return (
     `<li class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="./images/emoji/${emoji}" width="55" height="55" alt="emoji">
+          <img src="./images/emoji/${Emoji[emotion.toUpperCase()]}" width="55" height="55" alt="emoji">
         </span>
         <div>
           <p class="film-details__comment-text">${text}</p>
@@ -21,18 +28,18 @@ export const createCommentMarkup = (comment) => {
   );
 };
 
-const createCommentsMarkup = (comments) => {
-  return comments.map((comment) => {
+const createCommentsMarkup = (film, comments) => {
+  return comments[film.id].map((comment) => {
     return createCommentMarkup(comment);
   }).join(``);
 };
 
-const createCommentsTemplate = (comments) => {
+const createCommentsTemplate = (film, comments) => {
   return (
     `<div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-          <ul class="film-details__comments-list">${createCommentsMarkup(comments)}</ul>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments[film.id].length}</span></h3>
+          <ul class="film-details__comments-list">${createCommentsMarkup(film, comments)}</ul>
 
           <div class="film-details__new-comment">
             <div for="add-emoji" class="film-details__add-emoji-label"></div>
@@ -69,13 +76,14 @@ const createCommentsTemplate = (comments) => {
 };
 
 export default class Comments extends AbstractComponent {
-  constructor(film) {
+  constructor(film, comments) {
     super();
 
     this._film = film;
+    this._comments = comments;
   }
 
   getTemplate() {
-    return createCommentsTemplate(this._film);
+    return createCommentsTemplate(this._film, this._comments);
   }
 }

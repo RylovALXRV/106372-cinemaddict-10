@@ -31,8 +31,7 @@ const STATISTICS_PERIOD = [
 const Film = {
   START: 0,
   END: 2,
-  SHOW: 5,
-  COUNT: 22
+  SHOW: 5
 };
 
 const UserRank = {
@@ -58,5 +57,11 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
+const FilterValue = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
+};
+
 export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIOD};
+  StatisticsFilterValue, STATISTICS_PERIOD, FilterValue};

@@ -1,10 +1,16 @@
 import {FilterType, MENU_NAMES} from "../const";
 import AbstractComponent from "./abstract-component";
 
+const Filters = {
+  history: `alreadyWatched`,
+  favorites: `favorite`,
+  watchlist: `watchlist`
+};
+
 const createMenuListMarkup = (filters) => {
   return MENU_NAMES.map((menuName) => {
     return `<a href="#${menuName}" class="main-navigation__item" data-filter-type="${menuName}">${menuName[0].toLocaleUpperCase() + menuName.slice(1)}
-              <span class="main-navigation__item-count">${filters[menuName]}</span>
+              <span class="main-navigation__item-count">${filters[Filters[menuName]]}</span>
             </a>`;
   }).join(``);
 };

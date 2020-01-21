@@ -6,6 +6,7 @@ import {getWatchedFilmsByFilter} from "../utils/statistics";
 export default class Films {
   constructor() {
     this._films = [];
+    this._comments = [];
 
     this._activeFilterType = FilterType.ALL;
 
@@ -17,6 +18,10 @@ export default class Films {
     this._films = Array.from(films);
   }
 
+  setComments(comments) {
+    this._comments = Array.from(comments);
+  }
+
   getFilms() {
     return getFilmsByFilter(this._films, this._activeFilterType);
   }
@@ -25,12 +30,16 @@ export default class Films {
     return getFilmsBySort(this.getFilms(), sortType);
   }
 
-  getWatchedFilms(films, sortType) {
-    return getWatchedFilmsByFilter(films, sortType);
+  getWatchedFilms(films, filterType) {
+    return getWatchedFilmsByFilter(films, filterType);
   }
 
   getAllFilms() {
     return this._films;
+  }
+
+  getComments() {
+    return this._comments;
   }
 
   deleteCommentFilm(film, id) {

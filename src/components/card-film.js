@@ -1,28 +1,30 @@
 import {Description} from "../const";
 import Common from "../utils/common";
 import AbstractComponent from "./abstract-component";
+import moment from "moment";
 
 export const createCardFilmTemplate = (film) => {
-  const {title, rating, year, duration, genres, poster, description, comments,
-    isWatchlist, isHistory, isFavorites} = film;
+  const {title, totalRating, date, runTime, genres, poster, description, comments,
+    watchlist, alreadyWatched, favorite} = film;
   const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
+  const year = moment(date).format(`YYYY`);
 
   return (
     `<article class="film-card">
           <h3 class="film-card__title">${title}</h3>
-          <p class="film-card__rating">${rating}</p>
+          <p class="film-card__rating">${totalRating}</p>
           <p class="film-card__info">
             <span class="film-card__year">${year}</span>
-            <span class="film-card__duration">${Common.generateHours(duration)}h ${Common.generateMinutes(duration)}m</span>
+            <span class="film-card__duration">${Common.generateHours(runTime)}h ${Common.generateMinutes(runTime)}m</span>
             <span class="film-card__genre">${genres.join(` `)}</span>
           </p>
-          <img src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
+          <img src="${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
           <p class="film-card__description">${descriptionFilm}</p>
           <a class="film-card__comments">${comments.length} comments</a>
           <form class="film-card__controls">
-            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${Common.isActiveButtonClass(isWatchlist)}">Add to watchlist</button>
-            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${Common.isActiveButtonClass(isHistory)}">Mark as watched</button>
-            <button class="film-card__controls-item button film-card__controls-item--favorite ${Common.isActiveButtonClass(isFavorites)}">Mark as favorite</button>
+            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${Common.isActiveButtonClass(watchlist)}">Add to watchlist</button>
+            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${Common.isActiveButtonClass(alreadyWatched)}">Mark as watched</button>
+            <button class="film-card__controls-item button film-card__controls-item--favorite ${Common.isActiveButtonClass(favorite)}">Mark as favorite</button>
           </form>
         </article>`
   );

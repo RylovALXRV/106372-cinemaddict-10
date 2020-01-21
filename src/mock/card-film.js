@@ -38,28 +38,27 @@ const generateFeatures = (features) => {
 
 const generateFilm = () => {
   const date = Common.getRandomDate();
-  const isHistory = Common.isRandomBoolean();
+  const alreadyWatched = Common.isRandomBoolean();
 
   return {
-    duration: Common.getRandomInteger(0, 180),
-    rating: Common.getRandomFloatNumber(0, 10),
-    releaseDate: date,
+    id: String(+new Date() + Math.random()),
+    comments: generateComments(Common.getRandomInteger(0, 5)),
     title: Common.getRandomElement(FilmFeature.TITLES),
-    year: date.getFullYear(),
-    genres: generateFeatures(FilmFeature.GENRES),
-    description: generateFeatures(FilmFeature.DESCRIPTIONS).join(` `),
+    totalRating: Common.getRandomFloatNumber(0, 10),
     poster: Common.getRandomElement(FilmFeature.POSTERS),
-    age: Common.getRandomInteger(0, 18),
+    ageRating: Common.getRandomInteger(0, 18),
     director: Common.getRandomElement(FilmFeature.DIRECTORS),
     writers: generateFeatures(FilmFeature.WRITERS),
     actors: generateFeatures(FilmFeature.ACTORS),
+    releaseDate: date,
     country: Common.getRandomElement(FilmFeature.COUNTRIES),
-    comments: generateComments(Common.getRandomInteger(0, 5)),
-    isWatchlist: Common.isRandomBoolean(),
-    isHistory,
-    isFavorites: Common.isRandomBoolean(),
-    id: String(+new Date() + Math.random()),
-    watchingDate: isHistory ? date : ``
+    runTime: Common.getRandomInteger(0, 180),
+    genres: generateFeatures(FilmFeature.GENRES),
+    description: generateFeatures(FilmFeature.DESCRIPTIONS).join(` `),
+    watchlist: Common.isRandomBoolean(),
+    alreadyWatched,
+    watchingDate: alreadyWatched ? date : ``,
+    favorite: Common.isRandomBoolean(),
   };
 };
 
