@@ -20,7 +20,7 @@ const StatisticsFilterValue = {
   YEAR: `year`
 };
 
-const STATISTICS_PERIOD = [
+const STATISTICS_PERIODS = [
   StatisticsFilterValue.ALL_TIME,
   StatisticsFilterValue.TODAY,
   StatisticsFilterValue.WEEK,
@@ -64,4 +64,4 @@ const FilterValue = {
 };
 
 export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIOD, FilterValue};
+  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue};
