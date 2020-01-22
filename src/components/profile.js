@@ -1,5 +1,5 @@
 import Common from "../utils/common";
-import {getAmountFilms} from "../mock/menu";
+import {getAmountFilms} from "../utils/filter";
 import AbstractComponent from "./abstract-component";
 
 const createProfileTemplate = (films) => {

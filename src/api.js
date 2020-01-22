@@ -26,8 +26,8 @@ export default class API {
       .then(Film.parseFilms);
   }
 
-  getComments(commentId) {
-    return this._load({url: `comments/${commentId}`})
+  getComments(filmId) {
+    return this._load({url: `comments/${filmId}`})
       .then((response) => response.json());
   }
 

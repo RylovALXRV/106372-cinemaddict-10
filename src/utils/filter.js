@@ -12,6 +12,16 @@ const getFavoritesFilms = (films) => {
   return films.filter((film) => !!film.favorite);
 };
 
+export const getAmountFilms = (films) => {
+  return films.reduce((accumulator, item) => {
+    return {
+      watchlist: accumulator.watchlist + item.watchlist,
+      alreadyWatched: accumulator.alreadyWatched + item.alreadyWatched,
+      favorite: accumulator.favorite + item.favorite
+    };
+  }, {watchlist: 0, favorite: 0, alreadyWatched: 0});
+};
+
 export const getFilmsByFilter = (films, filterType) => {
   switch (filterType) {
     case FilterType.ALL:

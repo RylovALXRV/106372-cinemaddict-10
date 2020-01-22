@@ -1,5 +1,5 @@
 import {RenderPosition} from "../const";
-import {getAmountFilms} from "../mock/menu";
+import {getAmountFilms} from "../utils/filter";
 import Menu from "../components/menu";
 import Render from "../utils/render";
 

@@ -1,14 +1,13 @@
-import {Film, RenderPosition, SortType} from "../const";
+import {Film, RenderPosition, SortType, Emoji, CommentFeature} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
-import {getAmountFilms} from "../mock/menu";
+import {getAmountFilms} from "../utils/filter";
 import {createNoMoviesMarkup} from "../components/films";
 import FilmDetails, {createImgEmojiMarkup} from "../components/film-details";
 import ButtonShowMore from "../components/button-show-more";
 import FilmsComments from "../components/films-comments";
 import FilmsRating from "../components/films-rating";
 import FilmController from "./film";
-import {Emoji, CommentFeature} from "../mock/comments";
 import FilmModel from "../models/film";
 
 export default class FilmsController {
@@ -120,7 +119,7 @@ export default class FilmsController {
     this._currentFilm = null;
   }
 
-  _onOpen(film, filmComponent, editFilmComponent, filmController) {
+  _onOpen(film, filmComponent, filmController) {
     if (filmComponent.getElement() === this._currentFilm) {
       return;
     }
@@ -169,6 +168,13 @@ export default class FilmsController {
 
       Render.render(emojiParentElement, Render.createElement(createImgEmojiMarkup(Emoji[img.value.toUpperCase()])),
           RenderPosition.BEFOREEND);
+    });
+
+    this._currentEditFilm.setRatingScoreFilmHandler((rate) => {
+      this._currentEditFilm.setRatingScoreFilm(film, rate);
+      const newFilm = FilmModel.clone(film);
+
+      this._onDataChange(filmController, film, newFilm);
     });
 
     this._currentEditFilm.render();

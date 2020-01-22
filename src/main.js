@@ -6,10 +6,11 @@ import PageController from "./controllers/page";
 import Render from "./utils/render";
 import Films from "./models/films";
 
-const AUTHORIZATION = `Basic eo0w590ik29889a=`;
+const BASE = 36;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict`;
+const authorization = `Basic ${Math.random().toString(BASE)}`;
 
-const api = new API(END_POINT, AUTHORIZATION);
+const api = new API(END_POINT, authorization);
 const filmsModel = new Films();
 
 api.getFilms()

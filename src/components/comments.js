@@ -1,12 +1,6 @@
 import AbstractComponent from "./abstract-component";
 import Common from "../utils/common";
-
-const Emoji = {
-  'SLEEPING': `sleeping.png`,
-  'SMILE': `smile.png`,
-  'PUKE': `puke.png`,
-  'ANGRY': `angry.png`
-};
+import {Emoji} from "../const";
 
 export const createCommentMarkup = (comment) => {
   const {emotion, comment: text, author, day, id} = comment;

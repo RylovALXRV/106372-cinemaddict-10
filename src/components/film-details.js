@@ -6,15 +6,22 @@ import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
 import he from "he";
 
-const parseFormData = (film, formData) => {
-  const watchlist = formData.get(FilterValue.WATCHLIST) === `on` ? Boolean(true) : Boolean(false);
-  const alreadyWatched = formData.get(FilterValue.WATCHED) === `on` ? Boolean(true) : Boolean(false);
-  const favorite = formData.get(FilterValue.FAVORITE) === `on` ? Boolean(true) : Boolean(false);
+const isChecked = {
+  'on': true,
+  'null': false
+};
 
-  film.watchlist = watchlist;
-  film.alreadyWatched = alreadyWatched;
-  film.favorite = favorite;
-  // film.watchingDate = film.alreadyWatched ? new Date() : ``;
+const parseFormData = (film, formData) => {
+  film.watchlist = isChecked[formData.get(FilterValue.WATCHLIST)];
+  film.alreadyWatched = isChecked[formData.get(FilterValue.WATCHED)];
+  film.favorite = isChecked[formData.get(FilterValue.FAVORITE)];
+
+  if (!film.alreadyWatched) {
+    film.watchingDate = new Date().toISOString();
+  }
+  // все равно не получается снять время при снятии просмотренно - выкидывает ошибку и пишет,
+  // что время должно быть в формате DateISOString - как-то так
+  // film.watchingDate = film.alreadyWatched ? new Date().toISOString() : null;
 
   return film;
 };
@@ -118,6 +125,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     super();
 
     this._film = film;
+    // не получилось поправить - вернул как было. Попробую так сделать.
     this._comments = comments;
 
     this._closePopup = null;
@@ -125,6 +133,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._deleteComment = null;
     this._addComment = null;
     this._addEmoji = null;
+    this._ratingScoreFilm = null;
 
     this._subscribeOnEvents();
   }
@@ -153,12 +162,17 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._addEmoji = handler;
   }
 
+  setRatingScoreFilmHandler(handler) {
+    this._ratingScoreFilm = handler;
+  }
+
   recoveryListeners() {
     this._subscribeOnEvents();
   }
 
   _subscribeOnEvents() {
     const element = this.getElement();
+    const ratingScoreElement = element.querySelector(`.film-details__user-rating-score`);
 
     element.querySelector(`.film-details__controls`).addEventListener(`change`, () => {
       this._changeControl();
@@ -193,6 +207,12 @@ export default class FilmDetails extends AbstractSmartComponent {
     element.querySelector(`.film-details__close-btn`).addEventListener(`click`, () => {
       this._closePopup();
     });
+
+    if (ratingScoreElement) {
+      ratingScoreElement.addEventListener(`change`, (evt) => {
+        this._ratingScoreFilm(evt.target.value);
+      });
+    }
   }
 
   _getFormElement() {
@@ -207,6 +227,12 @@ export default class FilmDetails extends AbstractSmartComponent {
     const formData = new FormData(this._getFormElement());
 
     return parseFormData(film, formData);
+  }
+
+  setRatingScoreFilm(film, score) {
+    film.personalRating = Number(score);
+
+    return film;
   }
 
   getEmojiLabelElement() {

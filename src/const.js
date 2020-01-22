@@ -63,5 +63,20 @@ const FilterValue = {
   FAVORITE: `favorite`
 };
 
+const Emoji = {
+  'SLEEPING': `sleeping.png`,
+  'SMILE': `smile.png`,
+  'PUKE': `puke.png`,
+  'ANGRY': `angry.png`
+};
+
+const CommentFeature = {
+  'TYPES': [`sleeping`, `smile`, `puke`, `angry`],
+  'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
+    `Very very old. Meh`, `Almost two hours? Seriously?`,
+    `Great movie!`, `I personally did't like the movie`, `Very interesting`],
+  'AUTHORS': [`Tim Macoveev`, `John Doe`, `Alexander Setro`, `Mary Chery`, `Kristina Selena`]
+};
+
 export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue};
+  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue, Emoji, CommentFeature};

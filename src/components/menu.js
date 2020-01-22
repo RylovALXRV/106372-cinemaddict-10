@@ -1,7 +1,7 @@
 import {FilterType, MENU_NAMES} from "../const";
 import AbstractComponent from "./abstract-component";
 
-const Filters = {
+const filterType = {
   history: `alreadyWatched`,
   favorites: `favorite`,
   watchlist: `watchlist`
@@ -10,7 +10,7 @@ const Filters = {
 const createMenuListMarkup = (filters) => {
   return MENU_NAMES.map((menuName) => {
     return `<a href="#${menuName}" class="main-navigation__item" data-filter-type="${menuName}">${menuName[0].toLocaleUpperCase() + menuName.slice(1)}
-              <span class="main-navigation__item-count">${filters[Filters[menuName]]}</span>
+              <span class="main-navigation__item-count">${filters[filterType[menuName]]}</span>
             </a>`;
   }).join(``);
 };
@@ -39,12 +39,13 @@ export default class Menu extends AbstractComponent {
   setMenuChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
+      const target = evt.target;
+
       if (evt.target.tagName !== `A`) {
         return;
       }
-      this._setActiveClassForMenu(evt.target);
-      const filterType = evt.target.dataset.filterType;
-      handler(filterType);
+      this._setActiveClassForMenu(target);
+      handler(target.dataset.filterType);
     });
   }
 
