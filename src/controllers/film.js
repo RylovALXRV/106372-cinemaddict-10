@@ -1,7 +1,7 @@
 import CardFilm from "../components/card-film";
 import Render from "../utils/render";
 import {RenderPosition} from "../const";
-import FilmDetails from "../components/film-details";
+import FilmModel from "../models/film";
 
 export default class FilmController {
   constructor(container, onOpen, onDataChange) {
@@ -18,29 +18,32 @@ export default class FilmController {
     const oldCardFilmComponent = this._cardFilmComponent;
 
     this._cardFilmComponent = new CardFilm(film);
-    this._editCardFilmComponent = new FilmDetails(film);
 
-    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this._editCardFilmComponent, this));
+    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this));
 
     this._cardFilmComponent.setClickAddWatchlistHandler(() => {
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isWatchlist: !film.isWatchlist,
-      }));
+      const newFilm = FilmModel.clone(film);
+      newFilm.watchlist = !newFilm.watchlist;
+      this._onDataChange(this, film, newFilm);
     });
 
     this._cardFilmComponent.setClickMarkAsWatchedHandler(() => {
-      const isHistory = !film.isHistory;
+      const newFilm = FilmModel.clone(film);
+      newFilm.alreadyWatched = !newFilm.alreadyWatched;
 
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isHistory,
-        watchingDate: isHistory ? new Date() : ``
-      }));
+      // комментарий с объяснением такой же как в film-details.js -> parseFormData()
+      if (!newFilm.alreadyWatched) {
+        newFilm.watchingDate = new Date().toISOString();
+      }
+
+      this._onDataChange(this, film, newFilm);
     });
 
     this._cardFilmComponent.setClickFavoriteHandler(() => {
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isFavorites: !film.isFavorites,
-      }));
+      const newFilm = FilmModel.clone(film);
+      newFilm.favorite = !newFilm.favorite;
+
+      this._onDataChange(this, film, newFilm);
     });
 
     if (oldCardFilmComponent) {

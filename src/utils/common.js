@@ -2,25 +2,8 @@ import {UserRank} from "../const";
 import moment from "moment";
 
 export default class Common {
-  static getRandomFloatNumber(min, max) {
-    return parseFloat((Math.random() * (max - min) + min).toFixed(1));
-  }
-
-  static getRandomInteger(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
-  }
-
   static getRandomElement(elements) {
     return elements[Math.floor(Math.random() * elements.length)];
-  }
-
-  static getRandomDate() {
-    const targetDate = new Date();
-    const diffValue = Common.getRandomInteger(0, 10000);
-
-    targetDate.setDate(targetDate.getDate() - diffValue);
-
-    return targetDate;
   }
 
   static formatDate(date) {
@@ -29,10 +12,6 @@ export default class Common {
 
   static formatReleaseDate(date) {
     return moment(date).format(`DD MMMM YYYY`);
-  }
-
-  static isRandomBoolean() {
-    return Math.random() > 0.5;
   }
 
   static getUserRank(count) {
@@ -53,7 +32,7 @@ export default class Common {
 
   static isFilmsRating(films) {
     return films.some((film) => {
-      return film.rating > 0;
+      return film.totalRating > 0;
     });
   }
 
@@ -68,7 +47,7 @@ export default class Common {
   }
 
   static compareRating(filmA, filmB) {
-    return filmB.rating - filmA.rating;
+    return filmB.totalRating - filmA.totalRating;
   }
 
   static compareDate(filmA, filmB) {

@@ -20,7 +20,7 @@ const StatisticsFilterValue = {
   YEAR: `year`
 };
 
-const STATISTICS_PERIOD = [
+const STATISTICS_PERIODS = [
   StatisticsFilterValue.ALL_TIME,
   StatisticsFilterValue.TODAY,
   StatisticsFilterValue.WEEK,
@@ -31,8 +31,7 @@ const STATISTICS_PERIOD = [
 const Film = {
   START: 0,
   END: 2,
-  SHOW: 5,
-  COUNT: 22
+  SHOW: 5
 };
 
 const UserRank = {
@@ -58,5 +57,26 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
+const FilterValue = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
+};
+
+const Emoji = {
+  'SLEEPING': `sleeping.png`,
+  'SMILE': `smile.png`,
+  'PUKE': `puke.png`,
+  'ANGRY': `angry.png`
+};
+
+const CommentFeature = {
+  'TYPES': [`sleeping`, `smile`, `puke`, `angry`],
+  'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
+    `Very very old. Meh`, `Almost two hours? Seriously?`,
+    `Great movie!`, `I personally did't like the movie`, `Very interesting`],
+  'AUTHORS': [`Tim Macoveev`, `John Doe`, `Alexander Setro`, `Mary Chery`, `Kristina Selena`]
+};
+
 export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIOD};
+  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue, Emoji, CommentFeature};

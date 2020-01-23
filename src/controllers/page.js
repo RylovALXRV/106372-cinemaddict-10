@@ -7,9 +7,9 @@ import FilterController from "./filter";
 import Statistics from "../components/statistics";
 
 export default class PageController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, api) {
     this._container = container;
-    this._filmsModels = filmsModel;
+    this._filmsModel = filmsModel;
 
     this._filmsComponent = new Films();
     this._sortComponent = new Sort();
@@ -17,7 +17,7 @@ export default class PageController {
 
     this._onSwitchScreens = this._onSwitchScreens.bind(this);
 
-    this._filmsController = new FilmsController(this._filmsComponent, filmsModel);
+    this._filmsController = new FilmsController(this._filmsComponent, filmsModel, api);
     this._filterController = new FilterController(this._container, filmsModel, this._onSwitchScreens);
 
     this._sortComponent.setClickSortTypeChangeHandler(this._filmsController._onSortTypeChange);
@@ -29,10 +29,10 @@ export default class PageController {
     Render.render(this._container, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
     Render.render(this._container, this._filmsComponent.getElement(), RenderPosition.BEFOREEND);
     Render.render(this._container, this._statisticsComponent.getElement(), RenderPosition.BEFOREEND);
-    this._filmsController.render(this._filmsModels.getAllFilms());
+    this._filmsController.render(this._filmsModel.getAllFilms());
 
     this._statisticsComponent.setSwitchStatisticFilter((filterValue) => {
-      return this._filmsModels.getWatchedFilms(this._statisticsComponent._getFilteredFilmsHistory(), filterValue);
+      return this._filmsModel.getWatchedFilms(this._statisticsComponent._getFilteredFilmsHistory(), filterValue);
     });
   }
 

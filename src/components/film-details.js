@@ -1,4 +1,4 @@
-import {RenderPosition} from "../const";
+import {RenderPosition, FilterValue} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import UserRating from "./user-rating";
@@ -6,21 +6,22 @@ import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
 import he from "he";
 
-const FilterValue = {
-  WATCHLIST: `watchlist`,
-  WATCHED: `watched`,
-  FAVORITE: `favorite`
+const isChecked = {
+  'on': true,
+  'null': false
 };
 
 const parseFormData = (film, formData) => {
-  const isWatchlist = formData.get(FilterValue.WATCHLIST) === `on` ? Boolean(true) : Boolean(false);
-  const isHistory = formData.get(FilterValue.WATCHED) === `on` ? Boolean(true) : Boolean(false);
-  const isFavorites = formData.get(FilterValue.FAVORITE) === `on` ? Boolean(true) : Boolean(false);
+  film.watchlist = isChecked[formData.get(FilterValue.WATCHLIST)];
+  film.alreadyWatched = isChecked[formData.get(FilterValue.WATCHED)];
+  film.favorite = isChecked[formData.get(FilterValue.FAVORITE)];
 
-  film.isWatchlist = isWatchlist;
-  film.isHistory = isHistory;
-  film.isFavorites = isFavorites;
-  film.watchingDate = film.isHistory ? new Date() : ``;
+  if (!film.alreadyWatched) {
+    film.watchingDate = new Date().toISOString();
+  }
+  // все равно не получается снять время при снятии просмотренно - выкидывает ошибку и пишет,
+  // что время должно быть в формате DateISOString - как-то так
+  // film.watchingDate = film.alreadyWatched ? new Date().toISOString() : null;
 
   return film;
 };
@@ -31,10 +32,10 @@ const generateGenresMarkup = (genres) => {
   }).join(``);
 };
 
-export const createFilmDetailsTemplate = (film) => {
-  const {title, rating, duration, genres, poster, description,
-    age, director, writers, actors, releaseDate, country,
-    isHistory, isWatchlist, isFavorites, comments} = film;
+export const createFilmDetailsTemplate = (film, comments) => {
+  const {title, totalRating, runTime, genres, poster, description,
+    ageRating, director, writers, actors, releaseDate, country,
+    alreadyWatched, watchlist, favorite} = film;
 
   return (
     `<section class="film-details">
@@ -45,8 +46,8 @@ export const createFilmDetailsTemplate = (film) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${poster}" alt="${poster.split(`/`)[0]}">
-              <p class="film-details__age">${age}+</p>
+              <img class="film-details__poster-img" src="${poster}" alt="${poster.split(`/`)[0]}">
+              <p class="film-details__age">${ageRating}+</p>
             </div>
 
             <div class="film-details__info">
@@ -57,7 +58,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </div>
 
                 <div class="film-details__rating">
-                  <p class="film-details__total-rating">${rating}</p>
+                  <p class="film-details__total-rating">${totalRating}</p>
                 </div>
               </div>
 
@@ -80,7 +81,7 @@ export const createFilmDetailsTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${Common.generateHours(duration)}h ${Common.generateMinutes(duration)}m</td>
+                  <td class="film-details__cell">${Common.generateHours(runTime)}h ${Common.generateMinutes(runTime)}m</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -98,19 +99,19 @@ export const createFilmDetailsTemplate = (film) => {
           </div>
 
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchlist ? `checked` : ``}>
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${watchlist ? `checked` : ``}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isHistory ? `checked` : ``}>
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${alreadyWatched ? `checked` : ``}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${isFavorites ? `checked` : ``}>
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${favorite ? `checked` : ``}>
             <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
           </section>
         </div>
     </form>
-    ${(isHistory) ? new UserRating(film).getTemplate() : ``}
-    ${new Comments(comments).getTemplate()}
+    ${(alreadyWatched) ? new UserRating(film).getTemplate() : ``}
+    ${new Comments(film, comments).getTemplate()}
   </section>`
   );
 };
@@ -120,22 +121,25 @@ export const createImgEmojiMarkup = (img) => {
 };
 
 export default class FilmDetails extends AbstractSmartComponent {
-  constructor(film) {
+  constructor(film, comments) {
     super();
 
     this._film = film;
+    // не получилось поправить - вернул как было. Попробую так сделать.
+    this._comments = comments;
 
     this._closePopup = null;
     this._changeControl = null;
     this._deleteComment = null;
     this._addComment = null;
     this._addEmoji = null;
+    this._ratingScoreFilm = null;
 
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmDetailsTemplate(this._film, this._comments);
   }
 
   setCommentAddKeydownHandler(handler) {
@@ -158,12 +162,17 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._addEmoji = handler;
   }
 
+  setRatingScoreFilmHandler(handler) {
+    this._ratingScoreFilm = handler;
+  }
+
   recoveryListeners() {
     this._subscribeOnEvents();
   }
 
   _subscribeOnEvents() {
     const element = this.getElement();
+    const ratingScoreElement = element.querySelector(`.film-details__user-rating-score`);
 
     element.querySelector(`.film-details__controls`).addEventListener(`change`, () => {
       this._changeControl();
@@ -198,6 +207,12 @@ export default class FilmDetails extends AbstractSmartComponent {
     element.querySelector(`.film-details__close-btn`).addEventListener(`click`, () => {
       this._closePopup();
     });
+
+    if (ratingScoreElement) {
+      ratingScoreElement.addEventListener(`change`, (evt) => {
+        this._ratingScoreFilm(evt.target.value);
+      });
+    }
   }
 
   _getFormElement() {
@@ -212,6 +227,12 @@ export default class FilmDetails extends AbstractSmartComponent {
     const formData = new FormData(this._getFormElement());
 
     return parseFormData(film, formData);
+  }
+
+  setRatingScoreFilm(film, score) {
+    film.personalRating = Number(score);
+
+    return film;
   }
 
   getEmojiLabelElement() {

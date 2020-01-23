@@ -21,8 +21,8 @@ const getTodayPeriodFilms = (films, date) => {
 };
 
 const getWeekPeriodFilms = (films, date) => {
-  const firstDateOfWeek = moment(date).startOf(`week`).format(`YYYY-MM-DD`);
-  const lastDateOfWeek = moment(date).endOf(`week`).format(`YYYY-MM-DD`);
+  const firstDateOfWeek = moment(date).startOf(`isoWeek`).format(`YYYY-MM-DD`);
+  const lastDateOfWeek = moment(date).endOf(`isoWeek`).format(`YYYY-MM-DD`);
 
   return films.filter((film) => {
     const watchedDate = moment(film.watchingDate).format(`YYYY-MM-DD`);

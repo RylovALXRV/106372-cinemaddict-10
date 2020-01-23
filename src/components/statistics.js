@@ -2,18 +2,18 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import Chart from "chart.js";
 import chartDataLabels from "chartjs-plugin-datalabels";
 import Common from "../utils/common";
-import {StatisticsFilterValue, STATISTICS_PERIOD} from "../const";
+import {StatisticsFilterValue, STATISTICS_PERIODS} from "../const";
 
 const calcUniqCountGenre = (films, genre) => {
   return films.filter((film) => {
-    return film.genres.indexOf(genre) !== -1;
+    return film.genres.includes(genre);
   }).length;
 };
 
-const getMaxIndex = (array) => {
-  let greatest = array[0];
+const getIndexMaxGenreAmount = (genres) => {
+  let greatest = genres[0];
   let index = 0;
-  array.forEach((item, i) => {
+  genres.forEach((item, i) => {
     if (item > greatest) {
       index = i;
       greatest = item;
@@ -54,8 +54,13 @@ const renderFilmsCharts = (ctx, films) => {
     options: {
       plugins: {
         datalabels: {
-          display: true,
-          color: `black`
+          anchor: `start`,
+          align: `start`,
+          offset: 10,
+          color: `#ffffff`,
+          font: {
+            size: 18,
+          }
         }
       },
       legend: {
@@ -64,8 +69,9 @@ const renderFilmsCharts = (ctx, films) => {
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: `white`,
-            fontSize: 20,
+            fontColor: `#ffffff`,
+            fontSize: 18,
+            padding: 30,
             stepSize: 1,
             beginAtZero: true
           },
@@ -84,7 +90,7 @@ const renderFilmsCharts = (ctx, films) => {
 };
 
 const createStatisticsFilters = (activeChecked) => {
-  return STATISTICS_PERIOD.map((statisticPeriod) => {
+  return STATISTICS_PERIODS.map((statisticPeriod) => {
     const isStatisticsChecked = (statisticPeriod === activeChecked);
 
     return (
@@ -97,7 +103,7 @@ const createStatisticsFilters = (activeChecked) => {
 
 const createStatisticsTemplate = (films, activeChecked) => {
   const totalDuration = films.reduce((accumulator, film) => {
-    return accumulator + film.duration;
+    return accumulator + film.runTime;
   }, 0);
   const uniqueGenres = getUniqueGenres(films);
   const genresAmount = getGenresAmount(films, uniqueGenres);
@@ -126,7 +132,7 @@ const createStatisticsTemplate = (films, activeChecked) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${films.length ? uniqueGenres[getMaxIndex(genresAmount)] : `-`}</p>
+        <p class="statistic__item-text">${films.length ? uniqueGenres[getIndexMaxGenreAmount(genresAmount)] : `-`}</p>
       </li>
     </ul>
 
@@ -166,7 +172,7 @@ export default class Statistics extends AbstractSmartComponent {
     const chartCtx = this._getStatisticsChartElement();
 
     this._resetCharts();
-    // не разобрался как сделать второй столбец под количество фильмов и кастомизировать цифры соответственно.
+
     this._filmsChart = renderFilmsCharts(chartCtx, this._films);
   }
 
@@ -214,6 +220,6 @@ export default class Statistics extends AbstractSmartComponent {
   }
 
   _getFilteredFilmsHistory() {
-    return this._filmsModel.getFilms().filter((film) => film.isHistory);
+    return this._filmsModel.getFilms().filter((film) => film.alreadyWatched);
   }
 }

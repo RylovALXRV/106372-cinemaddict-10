@@ -2,23 +2,23 @@ import AbstractComponent from "./abstract-component";
 
 const SCORE_COUNT = 9;
 
-const createUserRantingScoreMarkup = (number) => {
-  const checked = (number === SCORE_COUNT) ? `checked` : ``;
+const createUserRantingScoreMarkup = (number, rating) => {
+  const isChecked = (number === rating) ? `checked` : ``;
 
   return (
-    `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${number}" id="rating-${number}" ${checked}>
+    `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${number}" id="rating-${number}" ${isChecked}>
      <label class="film-details__user-rating-label" for="rating-${number}">${number}</label>`
   );
 };
 
-const createUserRantingScoreTemplate = (count) => {
-  return new Array(count).fill(``).map((item, i) => {
-    return createUserRantingScoreMarkup(i + 1);
+const createUserRantingScoreTemplate = (rating) => {
+  return new Array(SCORE_COUNT).fill(``).map((item, i) => {
+    return createUserRantingScoreMarkup((i + 1), rating);
   }).join(``);
 };
 
 const createUserRatingTemplate = (film) => {
-  const {poster, title} = film;
+  const {poster, title, personalRating} = film;
 
   return (
     `<div class="form-details__middle-container">
@@ -29,7 +29,7 @@ const createUserRatingTemplate = (film) => {
 
         <div class="film-details__user-score">
           <div class="film-details__user-rating-poster">
-            <img src="./images/posters/${poster}" alt="film-poster" class="film-details__user-rating-img">
+            <img src="${poster}" alt="film-poster" class="film-details__user-rating-img">
           </div>
 
           <section class="film-details__user-rating-inner">
@@ -38,7 +38,7 @@ const createUserRatingTemplate = (film) => {
             <p class="film-details__user-rating-feelings">How you feel it?</p>
 
             <div class="film-details__user-rating-score">
-              ${createUserRantingScoreTemplate(SCORE_COUNT)}
+              ${createUserRantingScoreTemplate(personalRating)}
             </div>
           </section>
         </div>
