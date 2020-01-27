@@ -1,4 +1,4 @@
-import {Film, RenderPosition, SortType, Emoji, CommentFeature} from "../const";
+import {Film, RenderPosition, SortType, Emoji, SHAKE_ANIMATION_TIMEOUT} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import {getAmountFilms} from "../utils/filter";
@@ -11,10 +11,12 @@ import FilmController from "./film";
 import FilmModel from "../models/film";
 
 export default class FilmsController {
-  constructor(container, filmsModel, api) {
+  constructor(container, filmsModel, api, sortComponent, statisticComponent) {
     this._container = container;
     this._filmsModel = filmsModel;
     this._api = api;
+    this._sortComponent = sortComponent;
+    this._statisticComponent = statisticComponent;
 
     this._filmsRatingComponent = new FilmsRating();
     this._filmsCommentComponent = new FilmsComments();
@@ -22,6 +24,7 @@ export default class FilmsController {
 
     this._currentFilm = null;
     this._currentEditFilm = null;
+    this._emotion = null;
 
     this._filmsCount = Film.SHOW;
 
@@ -31,12 +34,13 @@ export default class FilmsController {
     this._onDataChange = this._onDataChange.bind(this);
     this._onClose = this._onClose.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._changeFilmData = this._changeFilmData.bind(this);
 
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
   _renderFilms(films, parentElement, startIndex, endIndex) {
-    films.slice(startIndex, endIndex).forEach((film) => new FilmController(parentElement, this._onOpen, this._onDataChange).render(film));
+    films.slice(startIndex, endIndex).forEach((film) => new FilmController(parentElement, this._api, this._onOpen, this._changeFilmData).render(film));
   }
 
   _onSortTypeChange(sortType) {
@@ -44,7 +48,8 @@ export default class FilmsController {
       this._filmsCount = Film.SHOW;
     }
 
-    const sortedFilms = this._filmsModel.getSortedFilms(sortType);
+    this._filmsModel.setSortType(sortType);
+    const sortedFilms = this._filmsModel.getSortedFilms();
 
     const filmsContainer = document.querySelector(`.films-list__container`);
     filmsContainer.innerHTML = ``;
@@ -129,40 +134,53 @@ export default class FilmsController {
     }
 
     this._currentFilm = filmComponent.getElement();
-    this._currentEditFilm = new FilmDetails(film, this._filmsModel.getComments());
+    this._currentEditFilm = new FilmDetails(film);
 
     this._currentEditFilm.setCloseButtonClickHandler(this._onClose);
 
     this._currentEditFilm.setControlsChangeHandler(() => {
       this._currentEditFilm.getData(film);
-      const newFilm = FilmModel.clone(film);
-
-      this._onDataChange(filmController, film, newFilm);
+      this._changeFilmData(filmController, film);
     });
 
-    this._currentEditFilm.setCommentDeleteButtonClickHandler((commentId) => {
-      const filmComments = this._filmsModel.deleteCommentFilm(film, commentId);
-      this._onDataChange(filmController, film, Object.assign({}, film, {comments: filmComments}));
+    this._currentEditFilm.setCommentDeleteButtonClickHandler((target) => {
+      const commentId = target.dataset.id;
+      target.textContent = `Deleting...`;
+
+      this._api.deleteComment(commentId).then(() => {
+        this._filmsModel.deleteCommentFilm(film, commentId);
+        const newFilm = FilmModel.clone(film);
+
+        filmController.render(newFilm);
+      });
     });
 
-    this._currentEditFilm.setCommentAddKeydownHandler((text, imgElement) => {
-      const img = imgElement.src.split(`/`);
-
-      const comment = {
-        emoji: img[img.length - 1],
-        text,
-        author: Common.getRandomElement(CommentFeature.AUTHORS),
-        day: Common.formatDate(new Date()),
-        id: String(Date.now() + Math.random())
+    this._currentEditFilm.setCommentAddKeydownHandler((comment) => {
+      const newComment = {
+        emotion: this._emotion,
+        comment,
+        date: new Date().toISOString(),
       };
 
-      const filmComments = this._filmsModel.addCommentFilm(film, comment);
-      this._onDataChange(filmController, film, Object.assign({}, film, {
-        comments: filmComments
-      }));
+      this._api.addComment(film.id, newComment).then((filmModel) => {
+        this._currentEditFilm.getCommentInputElement().disabled = false;
+        this._currentEditFilm.getCommentInputElement().style.outline = ``;
+
+        this._filmsModel.addCommentFilm(film, film.id, filmModel.comments);
+        const newFilm = FilmModel.clone(film);
+
+        filmController.render(newFilm);
+      }).then(() => {
+        this._currentEditFilm.getCommentInputElement().disabled = true;
+      }).catch(() => {
+        this._currentEditFilm.getCommentInputElement().disabled = false;
+        this._currentEditFilm.getCommentInputElement().style.outline = `4px solid red`;
+        this._shake();
+      });
     });
 
     this._currentEditFilm.setEmojiChangeHandler((img) => {
+      this._emotion = img.value;
       const emojiParentElement = this._currentEditFilm.getEmojiLabelElement();
       emojiParentElement.innerHTML = ``;
 
@@ -170,8 +188,27 @@ export default class FilmsController {
           RenderPosition.BEFOREEND);
     });
 
-    this._currentEditFilm.setRatingScoreFilmHandler((rate) => {
-      this._currentEditFilm.setRatingScoreFilm(film, rate);
+    this._currentEditFilm.setRatingScoreFilmChangeHandler((target) => {
+      this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
+        element.disabled = true;
+      });
+
+      this._currentEditFilm.setRatingScoreFilm(film, target.value);
+      this._changeFilmData(filmController, film).then(() => {
+        this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
+          element.disabled = false;
+        });
+      }).catch(() => {
+        target.style.backgroundColor = `red`;
+
+        this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
+          element.disabled = false;
+        });
+      });
+    });
+
+    this._currentEditFilm.setCancelRatingScoreClickHandler(() => {
+      this._currentEditFilm.setRatingScoreFilm(film, 0);
       const newFilm = FilmModel.clone(film);
 
       this._onDataChange(filmController, film, newFilm);
@@ -183,7 +220,7 @@ export default class FilmsController {
   }
 
   _onDataChange(filmController, oldData, newData) {
-    this._api.updateFilm(oldData.id, newData)
+    return this._api.updateFilm(oldData.id, newData)
       .then((filmModel) => {
         const isSuccessUpdate = this._filmsModel.updateFilm(oldData.id, newData);
 
@@ -193,6 +230,22 @@ export default class FilmsController {
       });
   }
 
+  _changeFilmData(filmController, oldData) {
+    const newFilmData = FilmModel.clone(oldData);
+
+    return this._onDataChange(filmController, oldData, newFilmData);
+  }
+
+  _shake() {
+    this._currentFilm.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._currentEditFilm.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._currentFilm.style.animation = ``;
+      this._currentEditFilm.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   _removeFilms() {
     this._container.getFilmsListContainerElement().innerHTML = ``;
     Render.remove(this._filmsCommentComponent);
@@ -200,6 +253,10 @@ export default class FilmsController {
   }
 
   _onFilterChange() {
+    if (this._filmsModel.isFilterStatistic()) {
+      this._statisticComponent.setFilterStatisticByDefault();
+    }
+    this._sortComponent.setActiveClassElement(this._sortComponent.getSortTypeByDefault());
     this._filmsCount = Film.SHOW;
 
     this._removeFilms();

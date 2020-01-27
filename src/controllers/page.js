@@ -17,7 +17,7 @@ export default class PageController {
 
     this._onSwitchScreens = this._onSwitchScreens.bind(this);
 
-    this._filmsController = new FilmsController(this._filmsComponent, filmsModel, api);
+    this._filmsController = new FilmsController(this._filmsComponent, filmsModel, api, this._sortComponent, this._statisticsComponent);
     this._filterController = new FilterController(this._container, filmsModel, this._onSwitchScreens);
 
     this._sortComponent.setClickSortTypeChangeHandler(this._filmsController._onSortTypeChange);

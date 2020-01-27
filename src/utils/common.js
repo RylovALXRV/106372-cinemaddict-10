@@ -38,7 +38,7 @@ export default class Common {
 
   static isFilmsComments(films) {
     return films.some((film) => {
-      return film.comments.length > 0;
+      return film.commentsId.length > 0;
     });
   }
 

@@ -18,7 +18,7 @@ const createMenuListMarkup = (filters) => {
 const createMenuTemplate = (films) => {
   return (
     `<nav class="main-navigation">
-      <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
+      <a href="#all" class="main-navigation__item main-navigation__item--active" data-filter-type="${FilterType.ALL}">All movies</a>
       ${createMenuListMarkup(films)}
       <a href="#${FilterType.STATS}" class="main-navigation__item main-navigation__item--additional" data-filter-type="${FilterType.STATS}">Stats</a>
     </nav>`
@@ -44,12 +44,12 @@ export default class Menu extends AbstractComponent {
       if (evt.target.tagName !== `A`) {
         return;
       }
-      this._setActiveClassForMenu(target);
+      this.setActiveClassForMenu(target);
       handler(target.dataset.filterType);
     });
   }
 
-  _setActiveClassForMenu(target) {
+  setActiveClassForMenu(target) {
     this._getActiveClassMenu().classList.remove(`main-navigation__item--active`);
     target.classList.add(`main-navigation__item--active`);
   }

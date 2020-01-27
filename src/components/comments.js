@@ -22,18 +22,18 @@ export const createCommentMarkup = (comment) => {
   );
 };
 
-const createCommentsMarkup = (film, comments) => {
-  return comments[film.id].map((comment) => {
+const createCommentsMarkup = (comments) => {
+  return comments.map((comment) => {
     return createCommentMarkup(comment);
   }).join(``);
 };
 
-const createCommentsTemplate = (film, comments) => {
+const createCommentsTemplate = (comments) => {
   return (
     `<div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments[film.id].length}</span></h3>
-          <ul class="film-details__comments-list">${createCommentsMarkup(film, comments)}</ul>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+          <ul class="film-details__comments-list">${createCommentsMarkup(comments)}</ul>
 
           <div class="film-details__new-comment">
             <div for="add-emoji" class="film-details__add-emoji-label"></div>
@@ -43,22 +43,22 @@ const createCommentsTemplate = (film, comments) => {
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="sleeping">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
               <label class="film-details__emoji-label" for="emoji-smile">
                 <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="neutral-face">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
               <label class="film-details__emoji-label" for="emoji-sleeping">
                 <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="grinning">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="puke">
               <label class="film-details__emoji-label" for="emoji-gpuke">
                 <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="grinning">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
               <label class="film-details__emoji-label" for="emoji-angry">
                 <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
               </label>
@@ -70,14 +70,13 @@ const createCommentsTemplate = (film, comments) => {
 };
 
 export default class Comments extends AbstractComponent {
-  constructor(film, comments) {
+  constructor(comments) {
     super();
 
-    this._film = film;
     this._comments = comments;
   }
 
   getTemplate() {
-    return createCommentsTemplate(this._film, this._comments);
+    return createCommentsTemplate(this._comments);
   }
 }

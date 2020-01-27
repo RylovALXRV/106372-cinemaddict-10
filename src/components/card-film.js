@@ -4,7 +4,7 @@ import AbstractComponent from "./abstract-component";
 import moment from "moment";
 
 export const createCardFilmTemplate = (film) => {
-  const {title, totalRating, date, runTime, genres, poster, description, comments,
+  const {title, totalRating, date, runTime, genres, poster, description, commentsId,
     watchlist, alreadyWatched, favorite} = film;
   const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
   const year = moment(date).format(`YYYY`);
@@ -20,7 +20,7 @@ export const createCardFilmTemplate = (film) => {
           </p>
           <img src="${poster}" alt="${poster.split(`/`)[0]}" class="film-card__poster">
           <p class="film-card__description">${descriptionFilm}</p>
-          <a class="film-card__comments">${comments.length} comments</a>
+          <a class="film-card__comments">${commentsId.length} comments</a>
           <form class="film-card__controls">
             <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${Common.isActiveButtonClass(watchlist)}">Add to watchlist</button>
             <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${Common.isActiveButtonClass(alreadyWatched)}">Mark as watched</button>

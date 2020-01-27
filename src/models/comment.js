@@ -1,17 +1,15 @@
 export default class Comment {
   constructor(data) {
-    this.id = data[`id`];
-    this.author = data[`author`];
-    this.comment = data[`comment`];
     this.emotion = data[`emotion`];
+    this.comment = data[`comment`];
+    this.date = data[`date`];
   }
 
   toRAW() {
     return {
-      'id': this.id,
-      'author': this.author,
+      'emotion': this.emotion,
       'comment': this.comment,
-      'emotion': this.emotion
+      'date': this.date
     };
   }
 

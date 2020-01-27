@@ -208,6 +208,11 @@ export default class Statistics extends AbstractSmartComponent {
     this._renderCharts();
   }
 
+  setFilterStatisticByDefault() {
+    this._activeFilterType = StatisticsFilterValue.ALL_TIME;
+    this._filmsModel.getWatchedFilms(this._getFilteredFilmsHistory(), this._activeFilterType);
+  }
+
   _resetCharts() {
     if (this._filmsChart) {
       this._filmsChart.destroy();

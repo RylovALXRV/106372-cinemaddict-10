@@ -75,8 +75,9 @@ const CommentFeature = {
   'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
     `Very very old. Meh`, `Almost two hours? Seriously?`,
     `Great movie!`, `I personally did't like the movie`, `Very interesting`],
-  'AUTHORS': [`Tim Macoveev`, `John Doe`, `Alexander Setro`, `Mary Chery`, `Kristina Selena`]
 };
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue, Emoji, CommentFeature};
+  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue, Emoji, CommentFeature, SHAKE_ANIMATION_TIMEOUT};
