@@ -42,14 +42,14 @@ export default class Films {
     }
 
     film.comments = Array.prototype.concat(film.comments.slice(0, index), film.comments.slice(index + 1));
-    film.commentsId = Array.prototype.concat(film.commentsId.slice(0, index), film.commentsId.slice(index + 1));
+    film.commentsIds = Array.prototype.concat(film.commentsIds.slice(0, index), film.commentsIds.slice(index + 1));
 
     return film;
   }
 
   addCommentFilm(film, filmId, newComments) {
     film.comments = Array.prototype.concat(newComments);
-    film.commentsId = newComments.map((comment) => comment.id);
+    film.commentsIds = newComments.map((comment) => comment.id);
 
     return film;
   }

@@ -1,5 +1,4 @@
 import Film from "./models/film";
-import Comment from "./models/comment";
 
 const Method = {
   GET: `GET`,
@@ -35,7 +34,7 @@ export default class API {
   updateFilm(id, data) {
     return this._load({
       url: `movies/${id}`,
-      method: Method.PUT,
+      method: Method.PU,
       body: JSON.stringify(data.toRAW()),
       headers: new Headers({'Content-Type': `application/json`})
     })
@@ -50,8 +49,7 @@ export default class API {
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then((response) => response.json())
-      .then(Comment.parseFilm);
+      .then((response) => response.json());
   }
 
   deleteComment(id) {

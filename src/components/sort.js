@@ -22,9 +22,17 @@ export default class Sort extends AbstractComponent {
     return createSortTemplate();
   }
 
+  getSortTypeByDefault() {
+    return this.getElement().querySelector(`a`);
+  }
+
   setActiveClassElement(target) {
     this._getButtonActiveElement().classList.remove(`sort__button--active`);
     target.classList.add(`sort__button--active`);
+  }
+
+  _getButtonActiveElement() {
+    return this.getElement().querySelector(`.sort__button--active`);
   }
 
   setClickSortTypeChangeHandler(handler) {
@@ -47,13 +55,5 @@ export default class Sort extends AbstractComponent {
 
       handler(this._currentSortType);
     });
-  }
-
-  getSortTypeByDefault() {
-    return this.getElement().querySelector(`a`);
-  }
-
-  _getButtonActiveElement() {
-    return this.getElement().querySelector(`.sort__button--active`);
   }
 }

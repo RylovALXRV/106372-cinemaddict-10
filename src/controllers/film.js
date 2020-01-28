@@ -1,6 +1,6 @@
 import CardFilm from "../components/card-film";
 import Render from "../utils/render";
-import {RenderPosition, SHAKE_ANIMATION_TIMEOUT} from "../const";
+import {RenderPosition} from "../const";
 
 export default class FilmController {
   constructor(container, api, onOpen, changeFilmData) {
@@ -15,6 +15,9 @@ export default class FilmController {
 
   render(film) {
     const oldCardFilmComponent = this._cardFilmComponent;
+    // добавил oldFilm для обновления(или для восстановления) прежних данных, т.к. данные меняются изначально
+    // в случае ошибки - восстанавливаю
+    const oldFilm = Object.assign({}, film);
 
     this._api.getComments(film.id).then((comments) => {
       film.comments = comments;
@@ -22,17 +25,18 @@ export default class FilmController {
 
     this._cardFilmComponent = new CardFilm(film);
 
-    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this));
+    this._cardFilmComponent.setOpenPopupClickHandler(() => this._onOpen(film, this._cardFilmComponent, this));
 
-    this._cardFilmComponent.setClickAddWatchlistHandler(() => {
+    this._cardFilmComponent.setAddWatchlistClickHandler(() => {
       film.watchlist = !film.watchlist;
 
       this._changeFilmData(this, film).catch(() => {
-        this._shake();
+        film.watchlist = oldFilm.watchlist;
+        this._cardFilmComponent.shake();
       });
     });
 
-    this._cardFilmComponent.setClickMarkAsWatchedHandler(() => {
+    this._cardFilmComponent.setMarkAsWatchedClickHandler(() => {
       film.alreadyWatched = !film.alreadyWatched;
 
       if (!film.alreadyWatched) {
@@ -41,15 +45,18 @@ export default class FilmController {
       }
 
       this._changeFilmData(this, film).catch(() => {
-        this._shake();
+        film.alreadyWatched = oldFilm.alreadyWatched;
+        film.personalRating = oldFilm.personalRating;
+        this._cardFilmComponent.shake();
       });
     });
 
-    this._cardFilmComponent.setClickFavoriteHandler(() => {
+    this._cardFilmComponent.setFavoriteClickHandler(() => {
       film.favorite = !film.favorite;
 
       this._changeFilmData(this, film).catch(() => {
-        this._shake();
+        film.favorite = oldFilm.favorite;
+        this._cardFilmComponent.shake();
       });
     });
 
@@ -58,13 +65,5 @@ export default class FilmController {
     } else {
       Render.render(this._container, this._cardFilmComponent.getElement(), RenderPosition.BEFOREEND);
     }
-  }
-
-  _shake() {
-    this._cardFilmComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._cardFilmComponent.getElement().style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }

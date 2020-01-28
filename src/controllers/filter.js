@@ -26,7 +26,7 @@ export default class FilterController {
     const oldFilterComponent = this._filterComponent;
 
     this._filterComponent = new Menu(filters);
-    this._filterComponent.setMenuChangeHandler(this._onFilterChange);
+    this._filterComponent.setMenuClickHandler(this._onFilterChange);
 
     if (oldFilterComponent) {
       Render.replace(this._filterComponent.getElement(), oldFilterComponent.getElement());

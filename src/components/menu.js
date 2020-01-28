@@ -36,7 +36,7 @@ export default class Menu extends AbstractComponent {
     return createMenuTemplate(this._filters);
   }
 
-  setMenuChangeHandler(handler) {
+  setMenuClickHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
       const target = evt.target;

@@ -2,10 +2,6 @@ import {UserRank} from "../const";
 import moment from "moment";
 
 export default class Common {
-  static getRandomElement(elements) {
-    return elements[Math.floor(Math.random() * elements.length)];
-  }
-
   static formatDate(date) {
     return moment(date).format(`YYYY/MM/DD hh:mm`);
   }
@@ -38,7 +34,7 @@ export default class Common {
 
   static isFilmsComments(films) {
     return films.some((film) => {
-      return film.commentsId.length > 0;
+      return film.commentsIds.length > 0;
     });
   }
 

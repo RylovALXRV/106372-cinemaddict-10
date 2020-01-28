@@ -6,6 +6,8 @@ import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
 import he from "he";
 
+const COLOR_RED = `#ff0000`;
+
 const parseFormData = (film, formData) => {
   film.watchlist = formData.get(FilterValue.WATCHLIST) === `on`;
   film.alreadyWatched = formData.get(FilterValue.WATCHED) === `on`;
@@ -15,9 +17,6 @@ const parseFormData = (film, formData) => {
     film.watchingDate = new Date().toISOString();
     film.personalRating = 0;
   }
-  // все равно не получается снять время при снятии просмотренно - выкидывает ошибку и пишет,
-  // что время должно быть в формате DateISOString - как-то так
-  // film.watchingDate = film.alreadyWatched ? new Date().toISOString() : null;
 
   return film;
 };
@@ -137,6 +136,131 @@ export default class FilmDetails extends AbstractSmartComponent {
     return createFilmDetailsTemplate(this._film);
   }
 
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  getData(film) {
+    const formData = new FormData(this._getFormElement());
+
+    return parseFormData(film, formData);
+  }
+
+  setRatingScoreFilm(film, score) {
+    score = Number(score);
+
+    film.personalRating = score;
+    film.alreadyWatched = Boolean(score);
+
+    return film;
+  }
+
+  getEmojiLabelElement() {
+    return this.getElement().querySelector(`.film-details__add-emoji-label`);
+  }
+
+  getEmojiPictureElement() {
+    return this.getElement().querySelector(`.film-details__add-emoji-label img`);
+  }
+
+  changeSettingsDeleteButton(currentButton, text, isDisabled) {
+    currentButton.textContent = text;
+    currentButton.disabled = isDisabled;
+  }
+
+  toggleUserRatingInputElements(isDisabled) {
+    this._getUserRatingInputElements().forEach((inputElement) => {
+      inputElement.disabled = isDisabled;
+    });
+  }
+
+  setSettingsForInputElement(isDisabled, style) {
+    this._getCommentInputElement().disabled = isDisabled;
+    this._getCommentInputElement().style.outline = style;
+  }
+
+  setBackgroundColorErrorForLabel(inputId) {
+    this.getElement().querySelector(`label[for=${inputId}]`).style.backgroundColor = COLOR_RED;
+  }
+
+  render() {
+    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+    const ratingScoreElement = element.querySelector(`.film-details__user-rating-score`);
+    const watchedResetElement = element.querySelector(`.film-details__watched-reset`);
+
+    element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      const target = evt.target;
+      this._changeControl(target).then((isError) => {
+        if (isError !== true) {
+          this.rerender();
+        }
+      });
+    });
+
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      this._addEmoji(evt.target);
+    });
+
+    element.querySelector(`.film-details__comments-list`).addEventListener(`click`, (evt) => {
+      const target = evt.target;
+
+      if (target.classList.contains(`film-details__comment-delete`)) {
+        this._deleteComment(target, target.dataset.id).then((isError) => {
+          if (isError !== true) {
+            this.rerender();
+          }
+        });
+      }
+    });
+
+    element.addEventListener(`keydown`, (evt) => {
+      const text = he.encode(this._getCommentInputElement().value);
+      const imgElement = this.getEmojiPictureElement();
+
+      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter` && text && imgElement) {
+        this._addComment(text).then((isError) => {
+          if (isError !== true) {
+            this.rerender();
+          }
+        });
+      }
+    });
+
+    element.querySelector(`.film-details__close-btn`).addEventListener(`click`, () => {
+      this._closePopup();
+    });
+
+    if (ratingScoreElement) {
+      ratingScoreElement.addEventListener(`change`, (evt) => {
+        this._rateScoreFilm(evt.target);
+      });
+    }
+
+    if (watchedResetElement) {
+      watchedResetElement.addEventListener(`click`, () => {
+        this._cancelRatingScoreFilm();
+
+        this.rerender();
+      });
+    }
+  }
+
+  _getFormElement() {
+    return this.getElement().querySelector(`.film-details__inner`);
+  }
+
+  _getCommentInputElement() {
+    return this.getElement().querySelector(`.film-details__comment-input`);
+  }
+
+  _getUserRatingInputElements() {
+    return this.getElement().querySelectorAll(`.film-details__user-rating-input`);
+  }
+
   setCommentAddKeydownHandler(handler) {
     this._addComment = handler;
   }
@@ -163,106 +287,5 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   setCancelRatingScoreClickHandler(handler) {
     this._cancelRatingScoreFilm = handler;
-  }
-
-  recoveryListeners() {
-    this._subscribeOnEvents();
-  }
-
-  _subscribeOnEvents() {
-    const element = this.getElement();
-    const ratingScoreElement = element.querySelector(`.film-details__user-rating-score`);
-    const watchedResetElement = element.querySelector(`.film-details__watched-reset`);
-
-    element.querySelector(`.film-details__controls`).addEventListener(`change`, () => {
-      this._changeControl();
-
-      this.rerender();
-    });
-
-    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
-      this._addEmoji(evt.target);
-    });
-
-    element.querySelector(`.film-details__comments-list`).addEventListener(`click`, (evt) => {
-      const target = evt.target;
-      if (target.classList.contains(`film-details__comment-delete`)) {
-        this._deleteComment(target);
-
-        this.rerender();
-      }
-    });
-
-    element.addEventListener(`keydown`, (evt) => {
-      const text = he.encode(this._getCommentInputElement().value);
-      const imgElement = this.getEmojiPictureElement();
-
-      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter` && text && imgElement) {
-        this._addComment(text);
-
-        this.rerender();
-      }
-    });
-
-    element.querySelector(`.film-details__close-btn`).addEventListener(`click`, () => {
-      this._closePopup();
-    });
-
-    if (ratingScoreElement) {
-      ratingScoreElement.addEventListener(`click`, (evt) => {
-        this._rateScoreFilm(evt.target);
-      });
-    }
-
-    if (watchedResetElement) {
-      watchedResetElement.addEventListener(`click`, () => {
-        this._cancelRatingScoreFilm();
-
-        this.rerender();
-      });
-    }
-  }
-
-  _getFormElement() {
-    return this.getElement().querySelector(`.film-details__inner`);
-  }
-
-  _getCommentInputElement() {
-    return this.getElement().querySelector(`.film-details__comment-input`);
-  }
-
-  getData(film) {
-    const formData = new FormData(this._getFormElement());
-
-    return parseFormData(film, formData);
-  }
-
-  setRatingScoreFilm(film, score) {
-    film.personalRating = Number(score);
-    if (Number(score) === 0) {
-      film.alreadyWatched = Boolean(false);
-    }
-
-    return film;
-  }
-
-  getEmojiLabelElement() {
-    return this.getElement().querySelector(`.film-details__add-emoji-label`);
-  }
-
-  getEmojiPictureElement() {
-    return this.getElement().querySelector(`.film-details__add-emoji-label img`);
-  }
-
-  getCommentInputElement() {
-    return this.getElement().querySelector(`.film-details__comment-input`);
-  }
-
-  getUserRatingInputElements() {
-    return this.getElement().querySelectorAll(`.film-details__user-rating-input`);
-  }
-
-  render() {
-    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
   }
 }

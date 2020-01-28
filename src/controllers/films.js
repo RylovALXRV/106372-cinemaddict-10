@@ -1,4 +1,4 @@
-import {Film, RenderPosition, SortType, Emoji, SHAKE_ANIMATION_TIMEOUT} from "../const";
+import {Film, RenderPosition, SortType, Emoji, Outline, SHAKE_ANIMATION_TIMEOUT} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import {getAmountFilms} from "../utils/filter";
@@ -10,8 +10,15 @@ import FilmsRating from "../components/films-rating";
 import FilmController from "./film";
 import FilmModel from "../models/film";
 
+const ButtonTextDelete = {
+  DEFAULT: `Delete`,
+  DELETE: `Deleting...`
+};
+
 export default class FilmsController {
-  constructor(container, filmsModel, api, sortComponent, statisticComponent) {
+  constructor(options = {}) {
+    const {container, api, filmsModel, sortComponent, statisticComponent} = options;
+
     this._container = container;
     this._filmsModel = filmsModel;
     this._api = api;
@@ -19,7 +26,7 @@ export default class FilmsController {
     this._statisticComponent = statisticComponent;
 
     this._filmsRatingComponent = new FilmsRating();
-    this._filmsCommentComponent = new FilmsComments();
+    this._filmsCommentsComponent = new FilmsComments();
     this._buttonShowMoreComponent = new ButtonShowMore();
 
     this._currentFilm = null;
@@ -37,6 +44,23 @@ export default class FilmsController {
     this._changeFilmData = this._changeFilmData.bind(this);
 
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  render() {
+    const films = this._filmsModel.getFilms();
+
+    if (films.length === getAmountFilms(films).history || !films.length) {
+      this._container.getFilmsListElement().innerHTML = ``;
+      Render.render(this._container.getFilmsListElement(), Render.createElement(createNoMoviesMarkup()), RenderPosition.BEFOREEND);
+    } else {
+      this._renderFilms(films, this._container.getFilmsListContainerElement(), Film.START, Film.SHOW);
+      this._renderFilmsCommentsElement();
+      this._renderFilmsRatingElement();
+
+      if (this._filmsCount < films.length) {
+        this._renderButtonShowMore(films);
+      }
+    }
   }
 
   _renderFilms(films, parentElement, startIndex, endIndex) {
@@ -63,9 +87,9 @@ export default class FilmsController {
 
   _renderFilmsCommentsElement() {
     if (Common.isFilmsComments(this._filmsModel.getFilms())) {
-      Render.render(this._container.getElement(), this._filmsCommentComponent.getElement(), RenderPosition.BEFOREEND);
+      Render.render(this._container.getElement(), this._filmsCommentsComponent.getElement(), RenderPosition.BEFOREEND);
       this._renderFilms(this._filmsModel.getFilms().slice().sort(Common.compareComments),
-          this._filmsCommentComponent.getFilmsListContainer(), Film.START, Film.END);
+          this._filmsCommentsComponent.getFilmsListContainerElement(), Film.START, Film.END);
     }
   }
 
@@ -73,7 +97,7 @@ export default class FilmsController {
     if (Common.isFilmsRating(this._filmsModel.getFilms())) {
       Render.render(this._container.getElement(), this._filmsRatingComponent.getElement(), RenderPosition.BEFOREEND);
       this._renderFilms(this._filmsModel.getFilms().slice().sort(Common.compareRating),
-          this._filmsRatingComponent.getFilmsListContainer(), Film.START, Film.END);
+          this._filmsRatingComponent.getFilmsListContainerElement(), Film.START, Film.END);
     }
   }
 
@@ -99,23 +123,6 @@ export default class FilmsController {
     });
   }
 
-  render() {
-    const films = this._filmsModel.getFilms();
-
-    if (films.length === getAmountFilms(films).history || !films.length) {
-      this._container.getFilmsListElement().innerHTML = ``;
-      Render.render(this._container.getFilmsListElement(), Render.createElement(createNoMoviesMarkup()), RenderPosition.BEFOREEND);
-    } else {
-      this._renderFilms(films, this._container.getFilmsListContainerElement(), Film.START, Film.SHOW);
-      this._renderFilmsCommentsElement();
-      this._renderFilmsRatingElement();
-
-      if (this._filmsCount < films.length) {
-        this._renderButtonShowMore(films);
-      }
-    }
-  }
-
   _onClose() {
     Render.remove(this._currentEditFilm);
     document.body.classList.remove(`hide-overflow`);
@@ -125,6 +132,9 @@ export default class FilmsController {
   }
 
   _onOpen(film, filmComponent, filmController) {
+    // аналогично, как и в filmController'е -> восстанавливаю данные
+    const oldFilm = Object.assign({}, film);
+
     if (filmComponent.getElement() === this._currentFilm) {
       return;
     }
@@ -138,20 +148,33 @@ export default class FilmsController {
 
     this._currentEditFilm.setCloseButtonClickHandler(this._onClose);
 
-    this._currentEditFilm.setControlsChangeHandler(() => {
+    this._currentEditFilm.setControlsChangeHandler((target) => {
       this._currentEditFilm.getData(film);
-      this._changeFilmData(filmController, film);
+
+      return this._changeFilmData(filmController, film).catch(() => {
+        target.checked = !target.checked;
+        // т.к. я сразу обновляю карточку, то в случае ошибки я ее возвращаю в прежнее состояние
+        // и здесь много данных, чтобы точечно не обновлять - обновляю сразу карточку
+        Object.assign(film, oldFilm);
+        this._shake();
+
+        return true;
+      });
     });
 
-    this._currentEditFilm.setCommentDeleteButtonClickHandler((target) => {
-      const commentId = target.dataset.id;
-      target.textContent = `Deleting...`;
+    this._currentEditFilm.setCommentDeleteButtonClickHandler((target, id) => {
+      this._currentEditFilm.changeSettingsDeleteButton(target, ButtonTextDelete.DELETE, true);
 
-      this._api.deleteComment(commentId).then(() => {
-        this._filmsModel.deleteCommentFilm(film, commentId);
+      return this._api.deleteComment(id).then(() => {
+        this._filmsModel.deleteCommentFilm(film, id);
         const newFilm = FilmModel.clone(film);
 
         filmController.render(newFilm);
+      }).catch(() => {
+        this._currentEditFilm.changeSettingsDeleteButton(target, ButtonTextDelete.DEFAULT, false);
+        this._shake();
+
+        return true;
       });
     });
 
@@ -162,20 +185,20 @@ export default class FilmsController {
         date: new Date().toISOString(),
       };
 
-      this._api.addComment(film.id, newComment).then((filmModel) => {
-        this._currentEditFilm.getCommentInputElement().disabled = false;
-        this._currentEditFilm.getCommentInputElement().style.outline = ``;
+      return this._api.addComment(film.id, newComment).then((filmModel) => {
+        this._currentEditFilm.setSettingsForInputElement(true, Outline.DEFAULT);
 
         this._filmsModel.addCommentFilm(film, film.id, filmModel.comments);
         const newFilm = FilmModel.clone(film);
 
         filmController.render(newFilm);
       }).then(() => {
-        this._currentEditFilm.getCommentInputElement().disabled = true;
+        this._currentEditFilm.setSettingsForInputElement(true, Outline.DEFAULT);
       }).catch(() => {
-        this._currentEditFilm.getCommentInputElement().disabled = false;
-        this._currentEditFilm.getCommentInputElement().style.outline = `4px solid red`;
+        this._currentEditFilm.setSettingsForInputElement(false, Outline.STYLE);
         this._shake();
+
+        return true;
       });
     });
 
@@ -189,29 +212,22 @@ export default class FilmsController {
     });
 
     this._currentEditFilm.setRatingScoreFilmChangeHandler((target) => {
-      this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
-        element.disabled = true;
-      });
-
+      this._currentEditFilm.toggleUserRatingInputElements(true);
       this._currentEditFilm.setRatingScoreFilm(film, target.value);
-      this._changeFilmData(filmController, film).then(() => {
-        this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
-          element.disabled = false;
-        });
-      }).catch(() => {
-        target.style.backgroundColor = `red`;
 
-        this._currentEditFilm.getUserRatingInputElements().forEach((element) => {
-          element.disabled = false;
-        });
+      this._changeFilmData(filmController, film).then(() => {
+        this._currentEditFilm.toggleUserRatingInputElements(false);
+      }).catch(() => {
+        film.personalRating = oldFilm.personalRating;
+        this._currentEditFilm.setBackgroundColorErrorForLabel(target.id);
+        this._currentEditFilm.toggleUserRatingInputElements(false);
+        this._shake();
       });
     });
 
     this._currentEditFilm.setCancelRatingScoreClickHandler(() => {
       this._currentEditFilm.setRatingScoreFilm(film, 0);
-      const newFilm = FilmModel.clone(film);
-
-      this._onDataChange(filmController, film, newFilm);
+      this._changeFilmData(filmController, film);
     });
 
     this._currentEditFilm.render();
@@ -236,19 +252,9 @@ export default class FilmsController {
     return this._onDataChange(filmController, oldData, newFilmData);
   }
 
-  _shake() {
-    this._currentFilm.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._currentEditFilm.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._currentFilm.style.animation = ``;
-      this._currentEditFilm.getElement().style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
-  }
-
   _removeFilms() {
     this._container.getFilmsListContainerElement().innerHTML = ``;
-    Render.remove(this._filmsCommentComponent);
+    Render.remove(this._filmsCommentsComponent);
     Render.remove(this._filmsRatingComponent);
   }
 
@@ -264,6 +270,16 @@ export default class FilmsController {
     this._renderFilmsCommentsElement();
     this._renderFilmsRatingElement();
     this._renderButtonShowMore(this._filmsModel.getFilms());
+  }
+
+  _shake() {
+    this._currentEditFilm.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._currentFilm.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._currentEditFilm.getElement().style.animation = ``;
+      this._currentFilm.style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   onEscKeydown(evt) {
