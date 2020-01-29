@@ -164,6 +164,38 @@ export default class Statistics extends AbstractSmartComponent {
     return createStatisticsTemplate(this._films, this._activeFilterType);
   }
 
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    this._films = this._filmsModel.getWatchedFilms(this._getFilteredFilmsHistory(), this._activeFilterType);
+
+    super.rerender();
+    this._renderCharts();
+  }
+
+  show() {
+    super.show();
+
+    this.rerender();
+  }
+
+  setFilterStatisticByDefault() {
+    if (this._activeFilterType !== StatisticsFilterValue.ALL_TIME) {
+      this._activeFilterType = StatisticsFilterValue.ALL_TIME;
+      this._filmsModel.getWatchedFilms(this._getFilteredFilmsHistory(), this._activeFilterType);
+    }
+  }
+
+  _getStatisticsChartElement() {
+    return this.getElement().querySelector(`.statistic__chart`);
+  }
+
+  _getFilteredFilmsHistory() {
+    return this._filmsModel.getFilms().filter((film) => film.alreadyWatched);
+  }
+
   _renderCharts() {
     if (!this._films) {
       this._films = this._getFilteredFilmsHistory();
@@ -176,8 +208,11 @@ export default class Statistics extends AbstractSmartComponent {
     this._filmsChart = renderFilmsCharts(chartCtx, this._films);
   }
 
-  recoveryListeners() {
-    this._subscribeOnEvents();
+  _resetCharts() {
+    if (this._filmsChart) {
+      this._filmsChart.destroy();
+      this._filmsChart = null;
+    }
   }
 
   _subscribeOnEvents() {
@@ -193,33 +228,5 @@ export default class Statistics extends AbstractSmartComponent {
 
   setSwitchStatisticFilter(handler) {
     this._switchStatisticFilter = handler;
-  }
-
-  show() {
-    super.show();
-
-    this.rerender();
-  }
-
-  rerender() {
-    this._films = this._filmsModel.getWatchedFilms(this._getFilteredFilmsHistory(), this._activeFilterType);
-
-    super.rerender();
-    this._renderCharts();
-  }
-
-  _resetCharts() {
-    if (this._filmsChart) {
-      this._filmsChart.destroy();
-      this._filmsChart = null;
-    }
-  }
-
-  _getStatisticsChartElement() {
-    return this.getElement().querySelector(`.statistic__chart`);
-  }
-
-  _getFilteredFilmsHistory() {
-    return this._filmsModel.getFilms().filter((film) => film.alreadyWatched);
   }
 }

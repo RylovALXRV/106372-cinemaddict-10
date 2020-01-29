@@ -15,7 +15,7 @@ export default class FilmsComments extends AbstractComponent {
   }
 
 
-  getFilmsListContainer() {
+  getFilmsListContainerElement() {
     return this.getElement().querySelector(`.films-list__container`);
   }
 }

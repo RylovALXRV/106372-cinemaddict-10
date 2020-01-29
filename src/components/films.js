@@ -1,11 +1,5 @@
 import AbstractComponent from "./abstract-component";
 
-const createNoMoviesMarkup = () => {
-  return (
-    `<h2 class="films-list__title">There are no movies in our database</h2>`
-  );
-};
-
 const createFilmsTemplate = () => {
   return (
     `<section class="films">
@@ -13,6 +7,20 @@ const createFilmsTemplate = () => {
         <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
         <div class="films-list__container"></div>
       </section>
+    </section>`
+  );
+};
+
+export const createNoMoviesMarkup = () => {
+  return (
+    `<h2 class="films-list__title">There are no movies in our database</h2>`
+  );
+};
+
+export const createLoadingMarkup = () => {
+  return (
+    `<section class="films">
+      <h2 class="films-list__title">Loading...</h2>
     </section>`
   );
 };
@@ -30,5 +38,3 @@ export default class Films extends AbstractComponent {
     return this.getElement().querySelector(`.films-list__container`);
   }
 }
-
-export {createNoMoviesMarkup};

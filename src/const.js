@@ -1,3 +1,21 @@
+const Description = {
+  'MAX_LENGTH': 140,
+  'DEFAULT_LENGTH': 139
+};
+
+const Emoji = {
+  'SLEEPING': `sleeping.png`,
+  'SMILE': `smile.png`,
+  'PUKE': `puke.png`,
+  'ANGRY': `angry.png`
+};
+
+const Film = {
+  START: 0,
+  END: 2,
+  SHOW: 5
+};
+
 const FilterType = {
   ALL: `all`,
   WATCHLIST: `watchlist`,
@@ -6,43 +24,15 @@ const FilterType = {
   STATS: `stats`
 };
 
-const MENU_NAMES = [
-  FilterType.WATCHLIST,
-  FilterType.HISTORY,
-  FilterType.FAVORITES
-];
-
-const StatisticsFilterValue = {
-  ALL_TIME: `all-time`,
-  TODAY: `today`,
-  WEEK: `week`,
-  MONTH: `month`,
-  YEAR: `year`
+const FilterValue = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
 };
 
-const STATISTICS_PERIODS = [
-  StatisticsFilterValue.ALL_TIME,
-  StatisticsFilterValue.TODAY,
-  StatisticsFilterValue.WEEK,
-  StatisticsFilterValue.MONTH,
-  StatisticsFilterValue.YEAR
-];
-
-const Film = {
-  START: 0,
-  END: 2,
-  SHOW: 5
-};
-
-const UserRank = {
-  'NO_RANK': 0,
-  'NOTICE': 10,
-  'FAN': 20
-};
-
-const Description = {
-  'MAX_LENGTH': 140,
-  'DEFAULT_LENGTH': 139
+const Outline = {
+  DEFAULT: ``,
+  STYLE: `4px solid red`
 };
 
 const RenderPosition = {
@@ -57,26 +47,37 @@ const SortType = {
   RATING_DOWN: `rating-down`
 };
 
-const FilterValue = {
-  WATCHLIST: `watchlist`,
-  WATCHED: `watched`,
-  FAVORITE: `favorite`
+const StatisticsFilterValue = {
+  ALL_TIME: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
 };
 
-const Emoji = {
-  'SLEEPING': `sleeping.png`,
-  'SMILE': `smile.png`,
-  'PUKE': `puke.png`,
-  'ANGRY': `angry.png`
+const UserRank = {
+  'NO_RANK': 0,
+  'NOTICE': 10,
+  'FAN': 20
 };
 
-const CommentFeature = {
-  'TYPES': [`sleeping`, `smile`, `puke`, `angry`],
-  'TEXTS': [`Interesting setting and a good cast`, `Booooooooooring`,
-    `Very very old. Meh`, `Almost two hours? Seriously?`,
-    `Great movie!`, `I personally did't like the movie`, `Very interesting`],
-  'AUTHORS': [`Tim Macoveev`, `John Doe`, `Alexander Setro`, `Mary Chery`, `Kristina Selena`]
-};
+const HIDDEN_CLASS = `visually-hidden`;
 
-export {MENU_NAMES, Film, UserRank, Description, RenderPosition, SortType, FilterType,
-  StatisticsFilterValue, STATISTICS_PERIODS, FilterValue, Emoji, CommentFeature};
+const MENU_NAMES = [
+  FilterType.WATCHLIST,
+  FilterType.HISTORY,
+  FilterType.FAVORITES
+];
+
+const STATISTICS_PERIODS = [
+  StatisticsFilterValue.ALL_TIME,
+  StatisticsFilterValue.TODAY,
+  StatisticsFilterValue.WEEK,
+  StatisticsFilterValue.MONTH,
+  StatisticsFilterValue.YEAR
+];
+
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
+export {Description, Emoji, Film, FilterType, FilterValue, Outline, RenderPosition, SortType,
+  StatisticsFilterValue, UserRank, HIDDEN_CLASS, MENU_NAMES, STATISTICS_PERIODS, SHAKE_ANIMATION_TIMEOUT};

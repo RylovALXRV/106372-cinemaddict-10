@@ -1,49 +1,63 @@
 import CardFilm from "../components/card-film";
 import Render from "../utils/render";
 import {RenderPosition} from "../const";
-import FilmModel from "../models/film";
 
 export default class FilmController {
-  constructor(container, onOpen, onDataChange) {
+  constructor(container, api, onOpen, changeFilmData) {
     this._container = container;
 
     this._cardFilmComponent = null;
-    this._editCardFilmComponent = null;
+    this._api = api;
 
     this._onOpen = onOpen;
-    this._onDataChange = onDataChange;
+    this._changeFilmData = changeFilmData;
   }
 
   render(film) {
     const oldCardFilmComponent = this._cardFilmComponent;
+    // добавил oldFilm для обновления(или для восстановления) прежних данных, т.к. данные меняются изначально
+    // в случае ошибки - восстанавливаю
+    const oldFilm = Object.assign({}, film);
+
+    this._api.getComments(film.id).then((comments) => {
+      film.comments = comments;
+    });
 
     this._cardFilmComponent = new CardFilm(film);
 
-    this._cardFilmComponent.setClickOpenPopupHandler(() => this._onOpen(film, this._cardFilmComponent, this));
+    this._cardFilmComponent.setOpenPopupClickHandler(() => this._onOpen(film, this._cardFilmComponent, this));
 
-    this._cardFilmComponent.setClickAddWatchlistHandler(() => {
-      const newFilm = FilmModel.clone(film);
-      newFilm.watchlist = !newFilm.watchlist;
-      this._onDataChange(this, film, newFilm);
+    this._cardFilmComponent.setAddWatchlistClickHandler(() => {
+      film.watchlist = !film.watchlist;
+
+      this._changeFilmData(this, film).catch(() => {
+        film.watchlist = oldFilm.watchlist;
+        this._cardFilmComponent.shake();
+      });
     });
 
-    this._cardFilmComponent.setClickMarkAsWatchedHandler(() => {
-      const newFilm = FilmModel.clone(film);
-      newFilm.alreadyWatched = !newFilm.alreadyWatched;
+    this._cardFilmComponent.setMarkAsWatchedClickHandler(() => {
+      film.alreadyWatched = !film.alreadyWatched;
 
-      // комментарий с объяснением такой же как в film-details.js -> parseFormData()
-      if (!newFilm.alreadyWatched) {
-        newFilm.watchingDate = new Date().toISOString();
+      if (!film.alreadyWatched) {
+        film.watchingDate = new Date().toISOString();
+        film.personalRating = 0;
       }
 
-      this._onDataChange(this, film, newFilm);
+      this._changeFilmData(this, film).catch(() => {
+        film.alreadyWatched = oldFilm.alreadyWatched;
+        film.personalRating = oldFilm.personalRating;
+        this._cardFilmComponent.shake();
+      });
     });
 
-    this._cardFilmComponent.setClickFavoriteHandler(() => {
-      const newFilm = FilmModel.clone(film);
-      newFilm.favorite = !newFilm.favorite;
+    this._cardFilmComponent.setFavoriteClickHandler(() => {
+      film.favorite = !film.favorite;
 
-      this._onDataChange(this, film, newFilm);
+      this._changeFilmData(this, film).catch(() => {
+        film.favorite = oldFilm.favorite;
+        this._cardFilmComponent.shake();
+      });
     });
 
     if (oldCardFilmComponent) {

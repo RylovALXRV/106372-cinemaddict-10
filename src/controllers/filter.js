@@ -1,4 +1,4 @@
-import {RenderPosition} from "../const";
+import {FilterType, RenderPosition} from "../const";
 import {getAmountFilms} from "../utils/filter";
 import Menu from "../components/menu";
 import Render from "../utils/render";
@@ -9,7 +9,7 @@ export default class FilterController {
     this._filmsModel = filmsModel;
     this._onSwitchScreens = onSwitchScreens;
 
-    this._activeFilterType = null;
+    this._activeFilterType = FilterType.ALL;
     this._filterComponent = null;
 
     this._onFilterChange = this._onFilterChange.bind(this);
@@ -25,8 +25,8 @@ export default class FilterController {
 
     const oldFilterComponent = this._filterComponent;
 
-    this._filterComponent = new Menu(filters);
-    this._filterComponent.setMenuChangeHandler(this._onFilterChange);
+    this._filterComponent = new Menu(filters, this._activeFilterType);
+    this._filterComponent.setMenuClickHandler(this._onFilterChange);
 
     if (oldFilterComponent) {
       Render.replace(this._filterComponent.getElement(), oldFilterComponent.getElement());

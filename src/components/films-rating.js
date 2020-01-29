@@ -14,7 +14,7 @@ export default class FilmsRating extends AbstractComponent {
     return createFilmsRatingTemplate();
   }
 
-  getFilmsListContainer() {
+  getFilmsListContainerElement() {
     return this.getElement().querySelector(`.films-list__container`);
   }
 }

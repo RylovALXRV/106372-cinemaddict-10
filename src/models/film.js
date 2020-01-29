@@ -1,7 +1,8 @@
 export default class Film {
   constructor(data) {
     this.id = data[`id`];
-    this.comments = data[`comments`];
+    this.commentsIds = data[`comments`];
+    this.comments = [];
     this.title = data[`film_info`][`title`];
     this.alternativeTitle = data[`film_info`][`alternative_title`];
     this.totalRating = data[`film_info`][`total_rating`];
@@ -25,7 +26,7 @@ export default class Film {
   toRAW() {
     return {
       'id': this.id,
-      'comments': this.comments,
+      'comments': this.commentsIds,
       'film_info': {
         'title': this.title,
         'alternative_title': this.alternativeTitle,

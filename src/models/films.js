@@ -1,4 +1,4 @@
-import {FilterType} from "../const";
+import {FilterType, SortType} from "../const";
 import {getFilmsByFilter} from "../utils/filter";
 import {getFilmsBySort} from "../utils/sort";
 import {getWatchedFilmsByFilter} from "../utils/statistics";
@@ -6,9 +6,9 @@ import {getWatchedFilmsByFilter} from "../utils/statistics";
 export default class Films {
   constructor() {
     this._films = [];
-    this._comments = [];
 
     this._activeFilterType = FilterType.ALL;
+    this._activeSortedType = SortType.DEFAULT;
 
     this._filterChangeHandlers = [];
     this._dataChangeHandlers = [];
@@ -18,16 +18,12 @@ export default class Films {
     this._films = Array.from(films);
   }
 
-  setComments(comments) {
-    this._comments = Array.from(comments);
-  }
-
   getFilms() {
     return getFilmsByFilter(this._films, this._activeFilterType);
   }
 
-  getSortedFilms(sortType) {
-    return getFilmsBySort(this.getFilms(), sortType);
+  getSortedFilms() {
+    return getFilmsBySort(this.getFilms(), this._activeSortedType);
   }
 
   getWatchedFilms(films, filterType) {
@@ -38,10 +34,6 @@ export default class Films {
     return this._films;
   }
 
-  getComments() {
-    return this._comments;
-  }
-
   deleteCommentFilm(film, id) {
     const index = film.comments.findIndex((comment) => comment.id === id);
 
@@ -50,14 +42,16 @@ export default class Films {
     }
 
     film.comments = Array.prototype.concat(film.comments.slice(0, index), film.comments.slice(index + 1));
+    film.commentsIds = Array.prototype.concat(film.commentsIds.slice(0, index), film.commentsIds.slice(index + 1));
 
-    return film.comments;
+    return film;
   }
 
-  addCommentFilm(film, comment) {
-    film.comments = Array.prototype.concat(film.comments, comment);
+  addCommentFilm(film, filmId, newComments) {
+    film.comments = Array.prototype.concat(newComments);
+    film.commentsIds = newComments.map((comment) => comment.id);
 
-    return film.comments;
+    return film;
   }
 
   updateFilm(id, newData) {
@@ -77,6 +71,14 @@ export default class Films {
   setFilter(filterType) {
     this._activeFilterType = filterType;
     this._filterChangeHandlers.forEach((handler) => handler());
+  }
+
+  isFilterStatistic() {
+    return this._activeFilterType === FilterType.STATS;
+  }
+
+  setSortType(sortType) {
+    this._activeSortedType = sortType;
   }
 
   setFilterChangeHandler(handler) {

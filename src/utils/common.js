@@ -2,10 +2,6 @@ import {UserRank} from "../const";
 import moment from "moment";
 
 export default class Common {
-  static getRandomElement(elements) {
-    return elements[Math.floor(Math.random() * elements.length)];
-  }
-
   static formatDate(date) {
     return moment(date).format(`YYYY/MM/DD hh:mm`);
   }
@@ -38,12 +34,12 @@ export default class Common {
 
   static isFilmsComments(films) {
     return films.some((film) => {
-      return film.comments.length > 0;
+      return film.commentsIds.length > 0;
     });
   }
 
   static compareComments(filmA, filmB) {
-    return filmB.comments.length - filmA.comments.length;
+    return filmB.commentsIds.length - filmA.commentsIds.length;
   }
 
   static compareRating(filmA, filmB) {
@@ -51,7 +47,7 @@ export default class Common {
   }
 
   static compareDate(filmA, filmB) {
-    return filmB.releaseDate - filmA.releaseDate;
+    return +new Date(filmB.releaseDate) - +new Date(filmA.releaseDate);
   }
 
   static generateHours(minutes) {

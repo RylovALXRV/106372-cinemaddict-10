@@ -1,6 +1,5 @@
 import Render from "../utils/render";
-
-const HIDDEN_CLASS = `visually-hidden`;
+import {HIDDEN_CLASS, SHAKE_ANIMATION_TIMEOUT} from "../const";
 
 export default class AbstractComponent {
   constructor() {
@@ -35,5 +34,13 @@ export default class AbstractComponent {
     if (this._element) {
       this._element.classList.add(HIDDEN_CLASS);
     }
+  }
+
+  shake() {
+    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }
