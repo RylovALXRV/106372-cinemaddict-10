@@ -7,33 +7,35 @@ const filterType = {
   watchlist: `watchlist`
 };
 
-const createMenuListMarkup = (filters) => {
+const createMenuListMarkup = (filters, activeFilterClass) => {
   return MENU_NAMES.map((menuName) => {
-    return `<a href="#${menuName}" class="main-navigation__item" data-filter-type="${menuName}">${menuName[0].toLocaleUpperCase() + menuName.slice(1)}
+    const isActiveFilterClass = activeFilterClass === menuName ? `main-navigation__item--active` : ``;
+    return `<a href="#${menuName}" class="main-navigation__item ${isActiveFilterClass}" data-filter-type="${menuName}">${menuName[0].toLocaleUpperCase() + menuName.slice(1)}
               <span class="main-navigation__item-count">${filters[filterType[menuName]]}</span>
             </a>`;
   }).join(``);
 };
 
-const createMenuTemplate = (films) => {
+const createMenuTemplate = (films, activeFilterClass) => {
   return (
     `<nav class="main-navigation">
-      <a href="#all" class="main-navigation__item main-navigation__item--active" data-filter-type="${FilterType.ALL}">All movies</a>
-      ${createMenuListMarkup(films)}
-      <a href="#${FilterType.STATS}" class="main-navigation__item main-navigation__item--additional" data-filter-type="${FilterType.STATS}">Stats</a>
+      <a href="#all" class="main-navigation__item ${activeFilterClass === FilterType.ALL ? `main-navigation__item--active` : ``}" data-filter-type="${FilterType.ALL}">All movies</a>
+      ${createMenuListMarkup(films, activeFilterClass)}
+      <a href="#${FilterType.STATS}" class="main-navigation__item main-navigation__item--additional ${activeFilterClass === FilterType.STATS ? `main-navigation__item--active` : ``}" data-filter-type="${FilterType.STATS}">Stats</a>
     </nav>`
   );
 };
 
 export default class Menu extends AbstractComponent {
-  constructor(filters) {
+  constructor(filters, activeFilterClass) {
     super();
 
     this._filters = filters;
+    this._activeFilterClass = activeFilterClass;
   }
 
   getTemplate() {
-    return createMenuTemplate(this._filters);
+    return createMenuTemplate(this._filters, this._activeFilterClass);
   }
 
   setMenuClickHandler(handler) {

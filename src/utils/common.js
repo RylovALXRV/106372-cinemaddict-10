@@ -39,7 +39,7 @@ export default class Common {
   }
 
   static compareComments(filmA, filmB) {
-    return filmB.comments.length - filmA.comments.length;
+    return filmB.commentsIds.length - filmA.commentsIds.length;
   }
 
   static compareRating(filmA, filmB) {
@@ -47,7 +47,7 @@ export default class Common {
   }
 
   static compareDate(filmA, filmB) {
-    return filmB.releaseDate - filmA.releaseDate;
+    return +new Date(filmB.releaseDate) - +new Date(filmA.releaseDate);
   }
 
   static generateHours(minutes) {

@@ -1,13 +1,13 @@
-import {Description, SHAKE_ANIMATION_TIMEOUT} from "../const";
+import {Description} from "../const";
 import Common from "../utils/common";
 import AbstractComponent from "./abstract-component";
 import moment from "moment";
 
 export const createCardFilmTemplate = (film) => {
-  const {title, totalRating, date, runTime, genres, poster, description, commentsIds,
+  const {title, totalRating, releaseDate, runTime, genres, poster, description, commentsIds,
     watchlist, alreadyWatched, favorite} = film;
   const descriptionFilm = description.length > Description.MAX_LENGTH ? `${description.slice(0, Description.DEFAULT_LENGTH)}...` : description;
-  const year = moment(date).format(`YYYY`);
+  const year = moment(releaseDate).format(`YYYY`);
 
   return (
     `<article class="film-card">
@@ -39,14 +39,6 @@ export default class CardFilm extends AbstractComponent {
 
   getTemplate() {
     return createCardFilmTemplate(this._film);
-  }
-
-  shake() {
-    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this.getElement().style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _getFilmPosterElement() {

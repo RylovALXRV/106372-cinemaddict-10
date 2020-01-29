@@ -3,8 +3,7 @@ import Common from "../utils/common";
 import {Emoji} from "../const";
 
 export const createCommentMarkup = (comment) => {
-  const {emotion, comment: text, author, day, id} = comment;
-
+  const {emotion, comment: text, author, date, id} = comment;
   return (
     `<li class="film-details__comment">
         <span class="film-details__comment-emoji">
@@ -14,7 +13,7 @@ export const createCommentMarkup = (comment) => {
           <p class="film-details__comment-text">${text}</p>
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${author}</span>
-            <span class="film-details__comment-day">${Common.formatDate(day)}</span>
+            <span class="film-details__comment-day">${Common.formatDate(date)}</span>
             <button class="film-details__comment-delete" data-id="${id}">Delete</button>
           </p>
         </div>

@@ -40,20 +40,13 @@ export default class Sort extends AbstractComponent {
       evt.preventDefault();
       const target = evt.target;
 
-      if (target.tagName !== `A`) {
+      if (target.tagName !== `A` || target.classList.contains(`sort__button--active`)) {
         return;
       }
       this.setActiveClassElement(target);
 
       const sortType = target.dataset.sortType;
-
-      if (sortType === this._currentSortType) {
-        return;
-      }
-
-      this._currentSortType = sortType;
-
-      handler(this._currentSortType);
+      handler(sortType);
     });
   }
 }

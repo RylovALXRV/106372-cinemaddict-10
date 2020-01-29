@@ -17,6 +17,14 @@ export const createNoMoviesMarkup = () => {
   );
 };
 
+export const createLoadingMarkup = () => {
+  return (
+    `<section class="films">
+      <h2 class="films-list__title">Loading...</h2>
+    </section>`
+  );
+};
+
 export default class Films extends AbstractComponent {
   getTemplate() {
     return createFilmsTemplate();

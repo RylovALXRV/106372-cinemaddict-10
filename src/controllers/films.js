@@ -1,4 +1,4 @@
-import {Film, RenderPosition, SortType, Emoji, Outline, SHAKE_ANIMATION_TIMEOUT} from "../const";
+import {Film, RenderPosition, SortType, Emoji, Outline} from "../const";
 import Common from "../utils/common";
 import Render from "../utils/render";
 import {getAmountFilms} from "../utils/filter";
@@ -88,6 +88,7 @@ export default class FilmsController {
   _renderFilmsCommentsElement() {
     if (Common.isFilmsComments(this._filmsModel.getFilms())) {
       Render.render(this._container.getElement(), this._filmsCommentsComponent.getElement(), RenderPosition.BEFOREEND);
+
       this._renderFilms(this._filmsModel.getFilms().slice().sort(Common.compareComments),
           this._filmsCommentsComponent.getFilmsListContainerElement(), Film.START, Film.END);
     }
@@ -156,7 +157,7 @@ export default class FilmsController {
         // т.к. я сразу обновляю карточку, то в случае ошибки я ее возвращаю в прежнее состояние
         // и здесь много данных, чтобы точечно не обновлять - обновляю сразу карточку
         Object.assign(film, oldFilm);
-        this._shake();
+        this._currentEditFilm.shake();
 
         return true;
       });
@@ -170,15 +171,19 @@ export default class FilmsController {
         const newFilm = FilmModel.clone(film);
 
         filmController.render(newFilm);
+        this._updateFilms();
       }).catch(() => {
         this._currentEditFilm.changeSettingsDeleteButton(target, ButtonTextDelete.DEFAULT, false);
-        this._shake();
+        this._currentEditFilm.shake();
 
         return true;
       });
     });
 
-    this._currentEditFilm.setCommentAddKeydownHandler((comment) => {
+    this._currentEditFilm.setCommentAddKeydownHandler((field, comment) => {
+      this._currentEditFilm.setSettingsForInputElement(true, Outline.DEFAULT);
+      this._currentEditFilm.toggleCommentEmojiInputElements(true);
+
       const newComment = {
         emotion: this._emotion,
         comment,
@@ -186,17 +191,18 @@ export default class FilmsController {
       };
 
       return this._api.addComment(film.id, newComment).then((filmModel) => {
-        this._currentEditFilm.setSettingsForInputElement(true, Outline.DEFAULT);
-
         this._filmsModel.addCommentFilm(film, film.id, filmModel.comments);
         const newFilm = FilmModel.clone(film);
 
         filmController.render(newFilm);
       }).then(() => {
-        this._currentEditFilm.setSettingsForInputElement(true, Outline.DEFAULT);
+        this._currentEditFilm.setSettingsForInputElement(false, Outline.DEFAULT);
+        this._currentEditFilm.toggleCommentEmojiInputElements(false);
+        this._updateFilms();
       }).catch(() => {
         this._currentEditFilm.setSettingsForInputElement(false, Outline.STYLE);
-        this._shake();
+        this._currentEditFilm.toggleCommentEmojiInputElements(false);
+        this._currentEditFilm.shake();
 
         return true;
       });
@@ -221,7 +227,7 @@ export default class FilmsController {
         film.personalRating = oldFilm.personalRating;
         this._currentEditFilm.setBackgroundColorErrorForLabel(target.id);
         this._currentEditFilm.toggleUserRatingInputElements(false);
-        this._shake();
+        this._currentEditFilm.shake();
       });
     });
 
@@ -242,6 +248,8 @@ export default class FilmsController {
 
         if (isSuccessUpdate) {
           filmController.render(filmModel);
+
+          this._updateFilms();
         }
       });
   }
@@ -259,27 +267,24 @@ export default class FilmsController {
   }
 
   _onFilterChange() {
+    this._filmsCount = Film.SHOW;
+
     if (this._filmsModel.isFilterStatistic()) {
       this._statisticComponent.setFilterStatisticByDefault();
     }
-    this._sortComponent.setActiveClassElement(this._sortComponent.getSortTypeByDefault());
-    this._filmsCount = Film.SHOW;
 
+    this._sortComponent.setActiveClassElement(this._sortComponent.getSortTypeByDefault());
+    this._filmsModel.setSortType();
+
+    this._updateFilms();
+  }
+
+  _updateFilms() {
     this._removeFilms();
-    this._renderFilms(this._filmsModel.getFilms(), this._container.getFilmsListContainerElement(), Film.START, Film.SHOW);
+    this._renderFilms(this._filmsModel.getFilms(), this._container.getFilmsListContainerElement(), Film.START, this._filmsCount);
     this._renderFilmsCommentsElement();
     this._renderFilmsRatingElement();
     this._renderButtonShowMore(this._filmsModel.getFilms());
-  }
-
-  _shake() {
-    this._currentEditFilm.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._currentFilm.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._currentEditFilm.getElement().style.animation = ``;
-      this._currentFilm.style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   onEscKeydown(evt) {

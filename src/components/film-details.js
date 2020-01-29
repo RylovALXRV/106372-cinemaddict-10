@@ -129,6 +129,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._rateScoreFilm = null;
     this._cancelRatingScoreFilm = null;
 
+    this.setSettingsForInputElement = this.setSettingsForInputElement.bind(this);
     this._subscribeOnEvents();
   }
 
@@ -170,6 +171,12 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   toggleUserRatingInputElements(isDisabled) {
     this._getUserRatingInputElements().forEach((inputElement) => {
+      inputElement.disabled = isDisabled;
+    });
+  }
+
+  toggleCommentEmojiInputElements(isDisabled) {
+    this._getCommentEmojiElements().forEach((inputElement) => {
       inputElement.disabled = isDisabled;
     });
   }
@@ -222,7 +229,7 @@ export default class FilmDetails extends AbstractSmartComponent {
       const imgElement = this.getEmojiPictureElement();
 
       if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter` && text && imgElement) {
-        this._addComment(text).then((isError) => {
+        this._addComment(this._getCommentInputElement(), text).then((isError) => {
           if (isError !== true) {
             this.rerender();
           }
@@ -259,6 +266,10 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   _getUserRatingInputElements() {
     return this.getElement().querySelectorAll(`.film-details__user-rating-input`);
+  }
+
+  _getCommentEmojiElements() {
+    return this.getElement().querySelectorAll(`.film-details__emoji-item`);
   }
 
   setCommentAddKeydownHandler(handler) {

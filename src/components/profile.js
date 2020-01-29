@@ -3,7 +3,7 @@ import {getAmountFilms} from "../utils/filter";
 import AbstractComponent from "./abstract-component";
 
 const createProfileTemplate = (films) => {
-  const historiesFilms = getAmountFilms(films).history;
+  const historiesFilms = getAmountFilms(films).alreadyWatched;
 
   return (
     `<section class="header__profile profile">
