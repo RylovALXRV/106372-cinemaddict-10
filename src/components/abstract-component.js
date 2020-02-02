@@ -1,4 +1,4 @@
-import Render from "../utils/render";
+import Element from "../utils/element";
 import {HIDDEN_CLASS, SHAKE_ANIMATION_TIMEOUT} from "../const";
 
 export default class AbstractComponent {
@@ -15,7 +15,7 @@ export default class AbstractComponent {
 
   getElement() {
     if (!this._element) {
-      this._element = Render.createElement(this.getTemplate());
+      this._element = Element.create(this.getTemplate());
     }
     return this._element;
   }

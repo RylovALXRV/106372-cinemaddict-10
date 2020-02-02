@@ -1,7 +1,7 @@
 import {FilterType, RenderPosition} from "../const";
 import {getAmountFilms} from "../utils/filter";
 import Menu from "../components/menu";
-import Render from "../utils/render";
+import Element from "../utils/element";
 
 export default class FilterController {
   constructor(container, filmsModel, onSwitchScreens) {
@@ -29,9 +29,9 @@ export default class FilterController {
     this._filterComponent.setMenuClickHandler(this._onFilterChange);
 
     if (oldFilterComponent) {
-      Render.replace(this._filterComponent.getElement(), oldFilterComponent.getElement());
+      Element.replace(this._filterComponent.getElement(), oldFilterComponent.getElement());
     } else {
-      Render.render(container, this._filterComponent.getElement(), RenderPosition.BEFOREEND);
+      Element.render(container, this._filterComponent.getElement(), RenderPosition.BEFOREEND);
     }
   }
 

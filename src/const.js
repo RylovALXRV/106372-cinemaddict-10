@@ -30,6 +30,13 @@ const FilterValue = {
   FAVORITE: `favorite`
 };
 
+const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
 const Outline = {
   DEFAULT: ``,
   STYLE: `4px solid red`
@@ -39,6 +46,11 @@ const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   AFTEREND: `afterend`,
   BEFOREEND: `beforeend`
+};
+
+const ResponseStatus = {
+  END: 300,
+  START: 200
 };
 
 const SortType = {
@@ -79,5 +91,5 @@ const STATISTICS_PERIODS = [
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
-export {Description, Emoji, Film, FilterType, FilterValue, Outline, RenderPosition, SortType,
+export {Description, Emoji, Film, FilterType, FilterValue, Method, Outline, RenderPosition, ResponseStatus, SortType,
   StatisticsFilterValue, UserRank, HIDDEN_CLASS, MENU_NAMES, STATISTICS_PERIODS, SHAKE_ANIMATION_TIMEOUT};

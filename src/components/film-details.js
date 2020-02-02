@@ -1,6 +1,6 @@
 import {RenderPosition, FilterValue} from "../const";
 import Common from "../utils/common";
-import Render from "../utils/render";
+import Element from "../utils/element";
 import UserRating from "./user-rating";
 import Comments from "./comments";
 import AbstractSmartComponent from "./abstract-smart-component";
@@ -128,6 +128,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._addEmoji = null;
     this._rateScoreFilm = null;
     this._cancelRatingScoreFilm = null;
+    this._currentLabelElement = null;
 
     this.setSettingsForInputElement = this.setSettingsForInputElement.bind(this);
     this._subscribeOnEvents();
@@ -186,12 +187,13 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._getCommentInputElement().style.outline = style;
   }
 
-  setBackgroundColorErrorForLabel(inputId) {
+  setSettingsForLabelElement(film, inputId) {
+    document.querySelector(`#rating-${film.personalRating}`).checked = true;
     this.getElement().querySelector(`label[for=${inputId}]`).style.backgroundColor = COLOR_RED;
   }
 
   render() {
-    Render.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
+    Element.render(document.body, this.getElement(), RenderPosition.BEFOREEND);
   }
 
   _subscribeOnEvents() {
@@ -201,8 +203,9 @@ export default class FilmDetails extends AbstractSmartComponent {
 
     element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
       const target = evt.target;
-      this._changeControl(target).then((isError) => {
-        if (isError !== true) {
+
+      this._changeControl(target).then((isErrorCatch) => {
+        if (!isErrorCatch) {
           this.rerender();
         }
       });
@@ -216,8 +219,8 @@ export default class FilmDetails extends AbstractSmartComponent {
       const target = evt.target;
 
       if (target.classList.contains(`film-details__comment-delete`)) {
-        this._deleteComment(target, target.dataset.id).then((isError) => {
-          if (isError !== true) {
+        this._deleteComment(target, target.dataset.id).then((isErrorCatch) => {
+          if (!isErrorCatch) {
             this.rerender();
           }
         });
@@ -227,10 +230,9 @@ export default class FilmDetails extends AbstractSmartComponent {
     element.addEventListener(`keydown`, (evt) => {
       const text = he.encode(this._getCommentInputElement().value);
       const imgElement = this.getEmojiPictureElement();
-
-      if ((evt.ctrlKey || evt.metaKey) && evt.code === `Enter` && text && imgElement) {
-        this._addComment(this._getCommentInputElement(), text).then((isError) => {
-          if (isError !== true) {
+      if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter` && text && imgElement) {
+        this._addComment(text).then((isErrorCatch) => {
+          if (!isErrorCatch) {
             this.rerender();
           }
         });
@@ -243,7 +245,10 @@ export default class FilmDetails extends AbstractSmartComponent {
 
     if (ratingScoreElement) {
       ratingScoreElement.addEventListener(`change`, (evt) => {
-        this._rateScoreFilm(evt.target);
+        const target = evt.target;
+
+        this._setCurrentLabelElement(target);
+        this._rateScoreFilm(target);
       });
     }
 
@@ -270,6 +275,14 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   _getCommentEmojiElements() {
     return this.getElement().querySelectorAll(`.film-details__emoji-item`);
+  }
+
+  _setCurrentLabelElement(target) {
+    if (this._currentLabelElement) {
+      this._currentLabelElement.style.backgroundColor = ``;
+    }
+
+    this._currentLabelElement = document.querySelector(`label[for=${target.id}]`);
   }
 
   setCommentAddKeydownHandler(handler) {

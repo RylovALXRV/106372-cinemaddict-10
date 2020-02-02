@@ -79,7 +79,7 @@ export default class CardFilm extends AbstractComponent {
     this._getFilmCardControlsElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, handler);
   }
 
-  setFavoriteClickHandler(handler) {
+  setAddFavoriteClickHandler(handler) {
     this._getFilmCardControlsElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, handler);
   }
 }

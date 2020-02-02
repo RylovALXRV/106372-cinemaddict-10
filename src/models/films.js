@@ -54,14 +54,14 @@ export default class Films {
     return film;
   }
 
-  updateFilm(id, newData) {
+  updateFilm(id, newFilm) {
     const index = this._films.findIndex((film) => film.id === id);
 
     if (index === -1) {
       return false;
     }
 
-    this._films = Array.prototype.concat(this._films.slice(0, index), newData, this._films.slice(index + 1));
+    this._films = Array.prototype.concat(this._films.slice(0, index), newFilm, this._films.slice(index + 1));
 
     this._callHandlers(this._dataChangeHandlers);
 

@@ -1,9 +1,9 @@
 import {RenderPosition, FilterType} from "../const";
-import Render from "../utils/render";
+import Element from "../utils/element";
 import Films from "../components/films";
 import Sort from "../components/sort";
-import FilmsController from "./films";
-import FilterController from "./filter";
+import FilmsController from "./films-controller";
+import FilterController from "./filter-controller";
 import Statistics from "../components/statistics";
 
 export default class PageController {
@@ -32,9 +32,9 @@ export default class PageController {
 
   render() {
     this._filterController.render();
-    Render.render(this._container, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
-    Render.render(this._container, this._filmsComponent.getElement(), RenderPosition.BEFOREEND);
-    Render.render(this._container, this._statisticsComponent.getElement(), RenderPosition.BEFOREEND);
+    Element.render(this._container, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
+    Element.render(this._container, this._filmsComponent.getElement(), RenderPosition.BEFOREEND);
+    Element.render(this._container, this._statisticsComponent.getElement(), RenderPosition.BEFOREEND);
     this._filmsController.render(this._filmsModel.getAllFilms());
 
     this._statisticsComponent.setSwitchStatisticFilter((filterValue) => {

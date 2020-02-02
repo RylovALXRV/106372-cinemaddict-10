@@ -1,14 +1,8 @@
+import {Method, ResponseStatus} from "./const";
 import Film from "./models/film";
 
-const Method = {
-  GET: `GET`,
-  POST: `POST`,
-  PUT: `PUT`,
-  DELETE: `DELETE`
-};
-
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= ResponseStatus.START && response.status < ResponseStatus.END) {
     return response;
   }
   throw new Error(`${response.status}: ${response.statusText}`);
@@ -31,11 +25,11 @@ export default class API {
       .then((response) => response.json());
   }
 
-  updateFilm(id, data) {
+  updateFilm(id, film) {
     return this._load({
       url: `movies/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(film.toRAW()),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then((response) => response.json())

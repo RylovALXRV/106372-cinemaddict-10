@@ -1,7 +1,7 @@
 import {RenderPosition} from "../const";
 
-export default class Render {
-  static createElement(template) {
+export default class Element {
+  static create(template) {
     const divElement = document.createElement(`div`);
     divElement.innerHTML = template;
 
